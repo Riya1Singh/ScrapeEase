@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ScrapeEase</title>
+    <!-- Tailwind CSS -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4" rel="stylesheet"> -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0">
+
+    {% block css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <span class="hamburger-btn material-symbols-rounded">menu</span>
+            <a href="#" class="logo">
+                <img src="/static/images/logo.jpg" alt="logo">
+                <h2>ScrapeEase</h2>
+            </a>
+            <ul class="links">
+                <span class="close-btn material-symbols-rounded">close</span>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Portfolio</a></li>
+                <li><a href="#">Courses</a></li>
+                <li><a href="#">About us</a></li>
+                <li><a href="#">Contact us</a></li>
+            </ul>
+            <button class="login-btn">LOG IN</button>
+        </nav>
+    </header>
+    {% block content %}{% endblock %}
+    <footer>
+
+    </footer>
+    {% block js %}{% endblock %}
+</body>
+</html>
