@@ -22,16 +22,16 @@
     </div>
     <div class="login-section">
         <div class="form-box login">
-            <form action="">
+            <form action="/login" method="POST">
                 <h2>Sign In</h2>
                 <div class="input-box">
                     <span class="icon"><i class="bx bxs-envelope"></i></span>
-                    <input type="email" required />
-                    <label>Email</label>
+                    <input type="text" required  name="username"/>
+                    <label>Email or Username</label>
                 </div>
                 <div class="input-box">
                     <span class="icon"><i class="bx bxs-lock-alt"></i></span>
-                    <input type="password" required />
+                    <input type="password" required name="password"/>
                     <label>Password</label>
                 </div>
                 <div class="remember-password">
@@ -47,22 +47,22 @@
             </form>
         </div>
         <div class="form-box register">
-            <form action="">
+            <form action="/register" method="POST">
                 <h2>Sign Up</h2>
 
                 <div class="input-box">
                     <span class="icon"><i class="bx bxs-user"></i></span>
-                    <input type="text" required />
+                    <input type="text" required name="username" />
                     <label>Username</label>
                 </div>
                 <div class="input-box">
                     <span class="icon"><i class="bx bxs-envelope"></i></span>
-                    <input type="email" required />
+                    <input type="email" required name="email"/>
                     <label>Email</label>
                 </div>
                 <div class="input-box">
                     <span class="icon"><i class="bx bxs-lock-alt"></i></span>
-                    <input type="password" required />
+                    <input type="password" required name="password"/>
                     <label>Password</label>
                 </div>
                 <div class="remember-password">
