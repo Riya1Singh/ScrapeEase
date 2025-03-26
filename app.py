@@ -33,10 +33,14 @@ def scraper():
 def about():
     return render_template('about.html')
 
-@app.route('/protected')
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/index')
 @login_required
-def protected():
-    return render_template('protected.html')
+def index():
+    return render_template('index.html')
 
 if __name__ == '__main__':
     with app.app_context():

@@ -36,7 +36,7 @@ def login():
 
         if user and hashpw(password.encode('utf-8'), user.password.encode('utf-8')) == user.password.encode('utf-8'):
             login_user(user)
-            return redirect(url_for('protected'))  # Redirect to your home page
+            return redirect(url_for('index'))  # Redirect to your home page
 
         flash('Invalid username or password')
         return redirect(url_for('auth.login'))
