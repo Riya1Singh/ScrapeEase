@@ -1,118 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 0;
-          padding: 0;
-          background-color: #f7f7f7;
-        }
-        
-        /* Navbar styling */
-        .navbar {
-          display: flex;
-          justify-content: center;
-          background-color: transparent;
-          padding: 15px;
-          position: fixed;
-          top: 0;
-          width: 100%;
-          z-index: 1000;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-    
-        .navbar a {
-          color: white;
-          text-decoration: none;
-          margin: 0 20px;
-          font-size: 18px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          position: relative;
-          padding: 10px 0;
-          transition: color 0.3s ease, transform 0.3s ease;
-        }
-    
-        .navbar a::before {
-          content: "";
-          position: absolute;
-          bottom: 0;
-          left: 50%;
-          width: 0;
-          height: 2px;
-          background-color: #00bcd4;
-          transition: width 0.3s ease, left 0.3s ease;
-          transform: translateX(-50%);
-        }
-    
-        .navbar a:hover {
-          color: #00bcd4;
-          transform: scale(1.1);
-        }
-    
-        .navbar a:hover::before {
-          width: 100%;
-          left: 0;
-        }
-    
-        /* Smooth slide-down effect for active navbar items */
-        .navbar a.active {
-          background-color: #444;
-          padding: 15px 20px;
-          border-radius: 4px;
-        }
-    
-        /* Adding animation */
-        .navbar a:nth-child(odd) {
-          animation: slideIn 0.5s ease-out 0.3s forwards;
-        }
-    
-        .navbar a:nth-child(even) {
-          animation: slideIn 0.5s ease-out 0.5s forwards;
-        }
-    
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-    
-        /* Adding a hover effect to the navbar */
-        .navbar:hover {
-          /* background-color: #444; */
-          transition: background-color 0.3s ease;
-        }
-      </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7;
+    }
+
+    /* Navbar styling */
+    .navbar {
+      display: flex;
+      justify-content: center;
+      background-color: transparent;
+      padding: 15px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      margin: 0 20px;
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      padding: 10px 0;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .navbar a::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background-color: #00bcd4;
+      transition: width 0.3s ease, left 0.3s ease;
+      transform: translateX(-50%);
+    }
+
+    .navbar a:hover {
+      color: #00bcd4;
+      transform: scale(1.1);
+    }
+
+    .navbar a:hover::before {
+      width: 100%;
+      left: 0;
+    }
+
+    /* Smooth slide-down effect for active navbar items */
+    .navbar a.active {
+      background-color: #444;
+      padding: 15px 20px;
+      border-radius: 4px;
+    }
+
+    /* Adding animation */
+    .navbar a:nth-child(odd) {
+      animation: slideIn 0.5s ease-out 0.3s forwards;
+    }
+
+    .navbar a:nth-child(even) {
+      animation: slideIn 0.5s ease-out 0.5s forwards;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Adding a hover effect to the navbar */
+    .navbar:hover {
+      /* background-color: #444; */
+      transition: background-color 0.3s ease;
+    }
+
+    .about-section {
+      padding: 120px 0 60px 0;
+      background: #151719;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .about-image {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .about-image img {
+      width: 100%;
+      height: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .about-image:hover img {
+      transform: scale(1.05);
+    }
+
+    .about-content h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #0270D7;
+    }
+
+    .about-content p {
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      color: #9BA9B4;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-list li {
+      margin: 15px 0;
+      padding-left: 30px;
+      position: relative;
+      color: #9BA9B4;
+    }
+
+    .feature-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #0270D7;
+    }
+
+    @media (max-width: 768px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body style="background-color: black;">
   <div class="navbar">
     <a href="/index" class="nav-link">Home</a>
     <a href="/about" class="nav-link">About</a>
 
     <a href="/contact" class="nav-link">Contact</a>
-</div>
+  </div>
+  <section class="about-section">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-image">
+          <img src="https://www.webscraping.us/wp-content/uploads/2020/07/Data-Mining-Services-1536x1170.png" alt="ScrapeEase Technology" />
+        </div>
+        <div class="about-content">
+          <h1>About ScrapeEase</h1>
+          <p>ScrapeEase is a cutting-edge web scraping solution designed to simplify data extraction for businesses and
+            individuals. Our platform combines powerful technology with an intuitive interface to make web scraping
+            accessible to everyone.</p>
+
+          <p>Founded in 2025, we've been helping companies transform raw web data into actionable insights.</p>
+
+          <ul class="feature-list">
+            <li>Advanced AI-powered scraping technology</li>
+            <li>Real-time data extraction capabilities</li>
+            <li>99.9% accuracy in data collection</li>
+            <li>24/7 expert support team</li>
+            <li>Customizable scraping solutions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
 
 
-      <script>
-        // Adding active class to the clicked nav link
-        const navLinks = document.querySelectorAll('.nav-link');
-        
-        navLinks.forEach(link => {
-          link.addEventListener('click', () => {
-            navLinks.forEach(item => item.classList.remove('active'));
-            link.classList.add('active');
-          });
-        });
-      </script>
+  <script>
+    // Adding active class to the clicked nav link
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.forEach(item => item.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+  </script>
 </body>
+
 </html>
