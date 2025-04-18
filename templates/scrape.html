@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% with messages = 
+    get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+{% endwith %}
+        
+<div class="container">
+  <h2>Scrape a Website</h2>
+  <form method="POST" action="/scrape" id="scrapeForm">
+    <div class="form-group">
+      <label for="url">Website URL:</label>
+      <input type="text" id="url" name="url" class="form-control" placeholder="Enter website URL" required>
+    </div>
+
+    <div class="form-group">
+      <label for="prompt">Scraping Prompt</label>
+      <textarea id="prompt" name="prompt" class="form-control" placeholder="Describe what you want to scrape?" rows="4" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Scrape</button>
+  </form>
+
+
+  !-- 2) JS will inject the result here -->
+  <div id="result" class="mt-4"></div>
+</div>
+
+<!-- 3) AJAX + JSON handling -->
+<script>
+  document.getElementById('scrapeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    fetch('/scrape', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      const out = document.getElementById('result');
+      if (data.success) {
+        out.innerHTML = `
+          <h3>Scraping Result:</h3>
+          <div>${data.content}</div>
+        `;
+      } else {
+        out.innerHTML = <div class="alert alert-danger">${data.error}</div>;
+      }
+    })
+    .catch(() => {
+      document.getElementById('result').innerHTML =
+        <div class="alert alert-danger">Request failed.</div>;
+    });
+    });
+</script>
+{% endblock %}
