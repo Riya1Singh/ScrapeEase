@@ -6,6 +6,24 @@
     <title>Document</title>
 </head>
 <body>
-    
+    {% if result %}
+       <h3>Scraping Result:</h3>
+       <pre>{{ result }}</pre>
+    {% endif %}
+
 </body>
 </html>
+
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    {% if result %}
+        <h3>Scraping Result:</h3>
+        <pre>{{ result }}</pre>
+    {% else %}
+        <p>No result available. Please submit a request from the scrape page.</p>
+    {% endif %}
+</div>
+{% endblock %}
