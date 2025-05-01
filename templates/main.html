@@ -42,9 +42,10 @@
   <script>
     async function scrapeWebsite() {
       const url = document.getElementById('url').value;
+      const prompt = document.getElementById('parseDescription').value;
       const resultDiv = document.getElementById('scrapeResult');
-      if (!url) {
-        alert('Please enter a URL');
+      if (!url || !prompt) {
+        alert('Please enter both URL and prompt');
         return;
       }
       resultDiv.innerHTML = 'Scraping website...';
@@ -55,7 +56,7 @@
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: `url=${encodeURIComponent(url)}`
+          body: `url=${encodeURIComponent(url)}&prompt=${encodeURIComponent(prompt)}`
         });
         const data = await response.json();
         if (data.success) {
@@ -159,4 +160,3 @@ o Success case: displays parsed result
 o Handles network errors gracefully -->
 
 
-{% endblock %}

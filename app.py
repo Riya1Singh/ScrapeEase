@@ -55,6 +55,10 @@ def contact():
 def index():
     return render_template('index.html')
 
+@app.route('/main')
+@login_required
+def main():
+    return render_template('main.html')
 
 
 @app.route('/scrape', methods=['GET','POST'])
