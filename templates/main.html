@@ -5,6 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <style>
+    .content-box {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 
 <body>
@@ -69,32 +78,39 @@
       }
     }
     async function parseContent() {
-      const parseDescription =
-        document.getElementById('parseDescription').value;
+      const parseDescription = document.getElementById('parseDescription').value;
       const resultDiv = document.getElementById('parseResult');
+      
       if (!parseDescription) {
-        alert('Please enter a description of what to parse');
-        return;
+          alert('Please enter a description of what to parse');
+          return;
       }
+      
       resultDiv.innerHTML = 'Parsing content...';
       resultDiv.style.display = 'block';
+      
       try {
-        const response = await fetch('/parse', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body:
-            `parse_description=${encodeURIComponent(parseDescription)}`
-        });
-        const data = await response.json();
-        if (data.success) {
-          resultDiv.innerHTML = data.result;
-        } else {
-          resultDiv.innerHTML = `Error: ${data.error}`;
-        }
+          const response = await fetch('/parse', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: `parse_description=${encodeURIComponent(parseDescription)}`
+          });
+          
+          const data = await response.json();
+          if (data.success) {
+              // Convert newlines to <br> tags and preserve whitespace
+              resultDiv.innerHTML = data.result.split('\n').map(line => 
+                  line.trim()).join('<br>');
+              // Add CSS to preserve formatting
+              resultDiv.style.whiteSpace = 'pre-wrap';
+              resultDiv.style.wordWrap = 'break-word';
+          } else {
+              resultDiv.innerHTML = `Error: ${data.error}`;
+          }
       } catch (error) {
-        resultDiv.innerHTML = `Error: ${error.message}`;
+          resultDiv.innerHTML = `Error: ${error.message}`;
       }
     }
   </script>
