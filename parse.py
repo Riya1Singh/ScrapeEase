@@ -34,7 +34,7 @@ template = (
 
 
 #Model initialization
-model = OllamaLLM(model="llama3")
+model = OllamaLLM(model="llama3.1")
 
 #Creates Creates an instance of OllamaLLM
 #Uses "llama3" as the base model
@@ -44,17 +44,17 @@ model = OllamaLLM(model="llama3")
 
 #Main parsing function
 def parse_with_ollama(dom_chunks, parse_description):
- prompt = ChatPromptTemplate.from_template(template)
- chain = prompt | model
+    prompt = ChatPromptTemplate.from_template(template)
+    chain = prompt | model
 
- parsed_results = []
- for i, chunk in enumerate(dom_chunks, start=1):
-  response = chain.invoke(
- {"dom_content": chunk, "parse_description": parse_description}
- )
- print(f"Parsed batch: {i} of {len(dom_chunk)}")
- parsed_results.append(response)
- return "\n".join(parsed_results)
+    parsed_results = []
+    for i, chunk in enumerate(dom_chunks, start=1):
+      response = chain.invoke(
+    {"dom_content": chunk, "parse_description": parse_description}
+    )
+    print(f"Parsed batch: {i} of {len(dom_chunks)}")
+    parsed_results.append(response)
+    return "\n".join(parsed_results)
 
 
 
