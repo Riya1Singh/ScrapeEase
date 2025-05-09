@@ -7,6 +7,11 @@ import pandas as pd
 from io import StringIO
 import os
 from datetime import datetime
+from auth import auth_bp, User
+from models import db
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, login_required
+
 
 # Import functions from the original project
 sys.path.append("..")  # Add parent directory to path
@@ -22,6 +27,14 @@ if sys.platform.startswith("win"):
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a secure value in production
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ScrapeEase.db'  # Use SQLite for simplicity
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
+
+db.init_app(app)  # Initialize SQLAlchemy
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'auth.login' 
 
 @app.route('/about')
 def about():
@@ -45,6 +58,11 @@ def login():
 # Make sure the database is initialized
 db_initialized = False
 
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
+
+app.register_blueprint(auth_bp)
 # Add custom filters to Jinja environment
 @app.template_filter('fromjson')
 def fromjson(value):
@@ -441,5 +459,17 @@ def update_api_keys():
     
     return jsonify({'status': 'success', 'message': 'API keys updated successfully!'})
 
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/protected')
+@login_required
+def protected():
+    return render_template('protected.html')
+
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Create database tables
     app.run(debug=False) 
