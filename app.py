@@ -23,6 +23,25 @@ if sys.platform.startswith("win"):
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a secure value in production
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get['username']
+        password = request.form.get['password']
+        return "login submitted!"
+    return render_template('login.html')
+        
+       
+
+
 # Make sure the database is initialized
 db_initialized = False
 
