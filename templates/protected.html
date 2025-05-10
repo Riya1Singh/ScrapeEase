@@ -1,12 +1,531 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Protected Page</h2>
-<p>You are logged in!</p>
-<a href="{{ url_for('auth.logout') }}">Logout</a>
-{% endblock %}
-{% block css %}
+<!DOCTYPE html>
+<html lang="en" class="no-js">
 
-{% endblock %}
-{% block js %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ScrapEase - Protected Area</title>
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,600" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/animejs@3.0.1/lib/anime.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
+    <style>
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #151719;
+            color: #9BA9B4;
+        }
 
-{% endblock %}
+        /* Navbar styling */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background-color: transparent;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            padding: 10px 0;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar a::before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background-color: #00bcd4;
+            transition: width 0.3s ease, left 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .navbar a:hover {
+            color: #00bcd4;
+            transform: scale(1.1);
+        }
+
+        .navbar a:hover::before {
+            width: 100%;
+            left: 0;
+        }
+
+        /* Body wrap */
+        .body-wrap {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Main content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 120px 20px 60px 20px;
+        }
+
+        /* Protected section */
+        .protected-section {
+            background-color: #202B36;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .protected-header {
+            margin-bottom: 30px;
+        }
+
+        .protected-header h1 {
+            color: #0270D7;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .protected-header p {
+            color: #9BA9B4;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* User info section */
+        .user-info {
+            background-color: rgba(2, 112, 215, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 40px;
+            display: inline-block;
+            text-align: left;
+            min-width: 400px;
+        }
+
+        .user-info-item {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info-label {
+            font-weight: 600;
+            color: #fff;
+            width: 120px;
+        }
+
+        .user-info-value {
+            color: #0270D7;
+        }
+
+        /* Dashboard cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .dashboard-card {
+            background-color: #1D2026;
+            border-radius: 10px;
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-card-icon {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(2, 112, 215, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+            color: #0270D7;
+        }
+
+        .dashboard-card-title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .dashboard-card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0270D7;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card-description {
+            color: #9BA9B4;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Button styling */
+        .button {
+            padding: 12px 25px;
+            background-color: #0270D7;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            margin: 10px;
+        }
+
+        .button:hover {
+            background-color: #0F8AFD;
+            transform: translateY(-2px);
+        }
+
+        .button i {
+            margin-right: 8px;
+        }
+
+        /* Footer styling */
+        .site-footer {
+            background: #202B36;
+            padding: 40px 0;
+            margin-top: auto;
+        }
+        
+        .site-footer-inner {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer-brand {
+            margin-bottom: 24px;
+        }
+        
+        .footer-links {
+            display: flex;
+            margin-bottom: 24px;
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-links li {
+            margin-right: 24px;
+        }
+        
+        .footer-links a {
+            color: #9BA9B4;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #fff;
+        }
+        
+        .footer-social-links {
+            display: flex;
+            margin-bottom: 24px;
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-social-links li {
+            margin-right: 16px;
+        }
+        
+        .footer-social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #323D48;
+            transition: background 0.15s ease;
+            text-decoration: none;
+        }
+        
+        .footer-social-links a:hover {
+            background: #0270D7;
+        }
+        
+        .footer-copyright {
+            color: #9BA9B4;
+            font-size: 14px;
+            line-height: 22px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .user-info {
+                min-width: unset;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="is-boxed has-animations">
+    <div class="body-wrap">
+        <!-- Navigation -->
+        <div class="navbar">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/about" class="nav-link">About</a>
+            <a href="/contact" class="nav-link">Contact</a>
+            <a href="/main" class="nav-link">Scraper</a>
+            <a href="/protected" class="nav-link">Dashboard</a>
+            <a href="/logout" class="nav-link">Logout</a>
+        </div>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="protected-section">
+                <div class="protected-header">
+                    <h1>Welcome to Your Dashboard</h1>
+                    <p>This is a protected area accessible only to logged-in users. Here you can access your personal information, view your scraping history, and manage your account.</p>
+                </div>
+                
+                <!-- User Info -->
+                <div class="user-info">
+                    <div class="user-info-item">
+                        <div class="user-info-label">Username:</div>
+                        <div class="user-info-value">{{ current_user.username }}</div>
+                    </div>
+                    <div class="user-info-item">
+                        <div class="user-info-label">Email:</div>
+                        <div class="user-info-value">{{ current_user.email }}</div>
+                    </div>
+                    <div class="user-info-item">
+                        <div class="user-info-label">Account Status:</div>
+                        <div class="user-info-value">Active</div>
+                    </div>
+                    <div class="user-info-item">
+                        <div class="user-info-label">Member Since:</div>
+                        <div class="user-info-value">{{ current_user.created_at.strftime('%d %b %Y') }}</div>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Actions -->
+                <div>
+                    <a href="/main" class="button">
+                        <i class="fas fa-spider"></i> Start Scraping
+                    </a>
+                    <a href="/settings" class="button">
+                        <i class="fas fa-cog"></i> Account Settings
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Dashboard Stats -->
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <div class="dashboard-card-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="dashboard-card-title">Total Scrapes</div>
+                    </div>
+                    <div class="dashboard-card-value">24</div>
+                    <div class="dashboard-card-description">
+                        Number of web scraping jobs completed since joining
+                    </div>
+                </div>
+                
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <div class="dashboard-card-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <div class="dashboard-card-title">Data Points</div>
+                    </div>
+                    <div class="dashboard-card-value">1,248</div>
+                    <div class="dashboard-card-description">
+                        Total number of data points extracted from websites
+                    </div>
+                </div>
+                
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <div class="dashboard-card-icon">
+                            <i class="fas fa-save"></i>
+                        </div>
+                        <div class="dashboard-card-title">Saved Datasets</div>
+                    </div>
+                    <div class="dashboard-card-value">7</div>
+                    <div class="dashboard-card-description">
+                        Number of datasets you've saved for later use
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="protected-section">
+                <div class="protected-header">
+                    <h2>Recent Activity</h2>
+                    <p>Your most recent scraping activities and account updates</p>
+                </div>
+                
+                <div style="text-align: left; max-width: 800px; margin: 0 auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid #2E3237;">
+                                <th style="padding: 15px; text-align: left; color: #fff;">Date</th>
+                                <th style="padding: 15px; text-align: left; color: #fff;">Activity</th>
+                                <th style="padding: 15px; text-align: left; color: #fff;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #2E3237;">
+                                <td style="padding: 15px; color: #9BA9B4;">{{ now().strftime('%d %b %Y') }}</td>
+                                <td style="padding: 15px; color: #9BA9B4;">Scraped e-commerce product listings</td>
+                                <td style="padding: 15px;"><span style="background: rgba(2, 112, 215, 0.1); color: #0270D7; padding: 5px 10px; border-radius: 20px;">Completed</span></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #2E3237;">
+                                <td style="padding: 15px; color: #9BA9B4;">{{ (now().replace(day=now().day-1)).strftime('%d %b %Y') }}</td>
+                                <td style="padding: 15px; color: #9BA9B4;">Updated account settings</td>
+                                <td style="padding: 15px;"><span style="background: rgba(2, 112, 215, 0.1); color: #0270D7; padding: 5px 10px; border-radius: 20px;">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 15px; color: #9BA9B4;">{{ (now().replace(day=now().day-3)).strftime('%d %b %Y') }}</td>
+                                <td style="padding: 15px; color: #9BA9B4;">Extracted news article data</td>
+                                <td style="padding: 15px;"><span style="background: rgba(2, 112, 215, 0.1); color: #0270D7; padding: 5px 10px; border-radius: 20px;">Completed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="site-footer-inner">
+                <div class="brand footer-brand">
+                    <a href="/">
+                        <img class="header-logo-image" src="/static/images/logo.svg" alt="Logo">
+                    </a>
+                </div>
+                <ul class="footer-links list-reset">
+                    <li>
+                        <a href="/contact">Contact</a>
+                    </li>
+                    <li>
+                        <a href="/about">About us</a>
+                    </li>
+                    <li>
+                        <a href="/">FAQ's</a>
+                    </li>
+                    <li>
+                        <a href="/">Support</a>
+                    </li>
+                </ul>
+                <ul class="footer-social-links list-reset">
+                    <li>
+                        <a href="#">
+                            <span class="screen-reader-text">Facebook</span>
+                            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.023 16L6 9H3V6h3V4c0-2.7 1.672-4 4.08-4 1.153 0 2.144.086 2.433.124v2.821h-1.67c-1.31 0-1.563.623-1.563 1.536V6H13l-1 3H9.28v7H6.023z" fill="#0270D7" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="screen-reader-text">Twitter</span>
+                            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 3c-.6.3-1.2.4-1.9.5.7-.4 1.2-1 1.4-1.8-.6.4-1.3.6-2.1.8-.6-.6-1.5-1-2.4-1-1.7 0-3.2 1.5-3.2 3.3 0 .3 0 .5.1.7-2.7-.1-5.2-1.4-6.8-3.4-.3.5-.4 1-.4 1.7 0 1.1.6 2.1 1.5 2.7-.5 0-1-.2-1.5-.4C.7 7.7 1.8 9 3.3 9.3c-.3.1-.6.1-.9.1-.2 0-.4 0-.6-.1.4 1.3 1.6 2.3 3.1 2.3-1.1.9-2.5 1.4-4.1 1.4H0c1.5.9 3.2 1.5 5 1.5 6 0 9.3-5 9.3-9.3v-.4C15 4.3 15.6 3.7 16 3z" fill="#0270D7" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="screen-reader-text">Google</span>
+                            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.9 7v2.4H12c-.2 1-1.2 3-4 3-2.4 0-4.3-2-4.3-4.4 0-2.4 2-4.4 4.3-4.4 1.4 0 2.3.6 2.8 1.1l1.9-1.8C11.5 1.7 9.9 1 8 1 4.1 1 1 4.1 1 8s3.1 7 7 7c4 0 6.7-2.8 6.7-6.8 0-.5 0-.8-.1-1.2H7.9z" fill="#0270D7" />
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+                <div class="footer-copyright">&copy; 2025 ScrapEase all rights reserved</div>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="/static/main.min.js"></script>
+    <script>
+        // Initialize ScrollReveal for animations
+        if (window.ScrollReveal) {
+            const sr = ScrollReveal();
+            
+            sr.reveal('.protected-header', {
+                duration: 600,
+                distance: '20px',
+                easing: 'cubic-bezier(0.5, -0.01, 0, 1.005)',
+                origin: 'top',
+                delay: 300
+            });
+            
+            sr.reveal('.user-info', {
+                duration: 600,
+                distance: '20px',
+                easing: 'cubic-bezier(0.5, -0.01, 0, 1.005)',
+                origin: 'bottom',
+                delay: 600
+            });
+            
+            sr.reveal('.dashboard-card', {
+                duration: 600,
+                distance: '20px',
+                easing: 'cubic-bezier(0.5, -0.01, 0, 1.005)',
+                origin: 'bottom',
+                interval: 100
+            });
+        }
+    </script>
+</body>
+
+</html>

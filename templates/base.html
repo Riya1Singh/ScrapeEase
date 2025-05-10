@@ -10,8 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+     <!-- custom css-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style2.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     {% block head %}{% endblock %}
 </head>
@@ -187,32 +188,7 @@
             });
         });
     </script>
-    {% extends "base.html" %}
 
-{% block content %}
-<h1>Welcome to the Web Scraper</h1>
-
-<!-- Add your dark mode button here if not already in base.html -->
-<button id="darkModeToggle" class="dark-toggle">
-  Toggle Dark Mode
-</button>
-
-<!-- Step 3: JavaScript goes here -->
-<script>
-  const toggle = document.getElementById('darkModeToggle');
-
-  toggle.addEventListener('click', () => {
-    document.documentElement.classList.toggle('dark');
-
-    if (document.documentElement.classList.contains('dark')) {
-      toggle.textContent = 'Light Mode';
-    } else {
-      toggle.textContent = 'Dark Mode';
-    }
-  });
-</script>
-{% endblock %}
-    
     {% block scripts %}{% endblock %}
 </body>
 </html> 

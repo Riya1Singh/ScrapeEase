@@ -3,8 +3,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 from datetime import datetime
-import streamlit as st
 from dotenv import load_dotenv
+import streamlit as st
 
 # Load environment variables
 load_dotenv(override=True)
@@ -30,7 +30,7 @@ class ScrapedData(Base):
 # Create engine and session factory
 def get_engine():
     """Get SQLAlchemy engine from environment variables or session state"""
-    db_url = st.session_state.get('DATABASE_URL') or os.environ.get('DATABASE_URL')
+    db_url =  os.environ.get('DATABASE_URL')
     
     if not db_url:
         # Default to a local SQLite database if no URL is provided

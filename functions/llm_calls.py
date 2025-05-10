@@ -55,12 +55,12 @@ def call_llm_model(
     # 3) Set it in os.environ so that litellm / underlying client sees it
     if env_value:
         os.environ[env_var_name] = env_value
-
-    model_max_tokens = get_max_tokens(model) 
+    model_max_tokens = get_max_tokens(model)
+    # Only apply max_tokens if explicitly set, otherwise let model handle it
     if max_tokens is not None:
-        max_tokens = min(max_tokens, model_max_tokens) - 100
+        max_tokens = min(max_tokens, model_max_tokens) 
     elif use_model_max_tokens_if_none:
-        max_tokens = model_max_tokens - 100
+        max_tokens = model_max_tokens
 
     # Build the conversation messages
     messages = [

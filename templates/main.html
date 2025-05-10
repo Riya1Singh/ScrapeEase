@@ -1,572 +1,874 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en" class="no-js">
 
-{% block head %}
-
-
-
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ScrapEase - Main</title>
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,600" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <script src="https://unpkg.com/animejs@3.0.1/lib/anime.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
 <style>
-  .url-bubble {
-    background-color: #E6F9F3;
-    color: #0074D9;
-    border-radius: 15px;
-    padding: 8px 12px;
-    margin: 5px;
-    display: inline-block;
-    font-weight: bold;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #151719;
+            color: #9BA9B4;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background-color: transparent;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            padding: 10px 0;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar a::before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background-color: #00bcd4;
+            transition: width 0.3s ease, left 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .navbar a:hover {
+            color: #00bcd4;
+            transform: scale(1.1);
+        }
+
+        .navbar a:hover::before {
+            width: 100%;
+            left: 0;
+        }
+
+        /* Body wrap */
+        .body-wrap {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Main content layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 120px 20px 60px 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            background-color: #202B36;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-title i {
+            margin-right: 10px;
+            color: #0270D7;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #2E3237;
+            margin: 20px 0;
+        }
+
+        /* Content area styling */
+        .content {
+            background-color: #202B36;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            color: #0270D7;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #9BA9B4;
+            font-size: 1.1rem;
+        }
+
+        /* Form elements styling */
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: #151719;
+            border: 2px solid #2E3237;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #0270D7;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: #151719;
+            border: 2px solid #2E3237;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #0270D7;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            accent-color: #0270D7;
+        }
+
+        .form-check-label {
+            color: #fff;
+            font-size: 14px;
+        }
+
+        /* Range input styling */
+        .form-range {
+            width: 100%;
+            height: 8px;
+            padding: 0;
+            background: #2E3237;
+            border-radius: 5px;
+            appearance: none;
+            margin-bottom: 10px;
+        }
+
+        .form-range::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0270D7;
+            cursor: pointer;
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            color: #9BA9B4;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Button styling */
+        .button {
+            padding: 12px 25px;
+            background-color: #0270D7;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .button:hover {
+            background-color: #0F8AFD;
+            transform: translateY(-2px);
+        }
+
+        .button i {
+            margin-right: 8px;
+        }
+
+        .button-secondary {
+            background-color: transparent;
+            border: 2px solid #0270D7;
+            color: #0270D7;
+        }
+
+        .button-secondary:hover {
+            background-color: rgba(2, 112, 215, 0.1);
   }
   
+        .button-danger {
+            background-color: #E5363A;
+        }
+
+        .button-danger:hover {
+            background-color: #F05356;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .button-large {
+            padding: 15px 30px;
+            font-size: 18px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* URL bubbles styling */
   .url-bubble-container {
-    margin-top: 10px;
-    min-height: 40px;
-    border: 1px dashed #ccc;
+            min-height: 50px;
+            border: 1px dashed #2E3237;
     border-radius: 5px;
     padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
   }
   
-  .delete-url {
-    margin-left: 5px;
+        .url-bubble {
+            background-color: rgba(2, 112, 215, 0.1);
+            color: #0270D7;
+            border-radius: 20px;
+            padding: 8px 12px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .url-bubble i {
+            margin-left: 8px;
     cursor: pointer;
-    color: #dc3545;
+            color: #E5363A;
+        }
+
+        /* Field tags styling */
+        .field-tag-container {
+            min-height: 50px;
+            border: 1px dashed #2E3237;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
   }
   
   .field-tag {
-    background-color: #f0f8ff;
-    color: #0066cc;
-    border-radius: 15px;
-    padding: 5px 10px;
-    margin: 5px;
-    display: inline-block;
-    font-weight: bold;
+            background-color: rgba(2, 112, 215, 0.1);
+            color: #0270D7;
+            border-radius: 20px;
+            padding: 8px 12px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .field-tag i {
+            margin-left: 8px;
+            cursor: pointer;
+            color: #E5363A;
+        }
+
+        /* Input group */
+        .input-group {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .input-group .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            margin-bottom: 0;
+        }
+
+        .input-group .button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            padding: 0 15px;
+        }
+
+        /* Accordion styling */
+        .accordion {
+            margin-bottom: 20px;
+        }
+
+        .accordion-header {
+            background: #2E3237;
+            padding: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: #3E454F;
   }
   
-  .card {
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .accordion-header i {
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-header.active i {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            background: #151719;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .accordion-content.active {
+            display: block;
+        }
+
+        /* Alert styling */
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #fff;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .alert-danger {
+            background-color: rgba(229, 54, 58, 0.2);
+            border: 1px solid #E5363A;
+        }
+
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+        }
+
+        .alert-heading {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        /* Footer styling */
+        .site-footer {
+            background: #202B36;
+            padding: 40px 0;
+            margin-top: auto;
+        }
+        
+        .site-footer-inner {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer-brand {
     margin-bottom: 24px;
   }
   
-  .card-header {
-    background-color: #f8f9fa;
-    border-bottom: none;
-    font-weight: 600;
+        .footer-links {
+            display: flex;
+            margin-bottom: 24px;
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-links li {
+            margin-right: 24px;
+        }
+        
+        .footer-links a {
+            color: #9BA9B4;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #fff;
+        }
+        
+        .footer-social-links {
+            display: flex;
+            margin-bottom: 24px;
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-social-links li {
+            margin-right: 16px;
   }
   
-  .feature-icon {
-    font-size: 24px;
-    color: #0d6efd;
-    margin-bottom: 15px;
+        .footer-social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #323D48;
+            transition: background 0.15s ease;
+            text-decoration: none;
   }
   
-  .url-section {
-    max-height: 200px;
-    overflow-y: auto;
+        .footer-social-links a:hover {
+            background: #0270D7;
+        }
+        
+        .footer-copyright {
+            color: #9BA9B4;
+            font-size: 14px;
+            line-height: 22px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
   }
-  
-  #urlBubbleContainer {
-    min-height: 50px;
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
   }
 </style>
-{% endblock %}
+</head>
 
-{% block sidebar %}
-<!-- API Keys -->
-<div class="accordion mt-3" id="apiKeysAccordion">
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="apiKeysHeading">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#apiKeysCollapse" aria-expanded="false" aria-controls="apiKeysCollapse">
-        API Keys
-      </button>
-    </h2>
-    <div id="apiKeysCollapse" class="accordion-collapse collapse" aria-labelledby="apiKeysHeading" data-bs-parent="#apiKeysAccordion">
-      <div class="accordion-body">
-        <form id="apiKeysForm">
-          {% for model, required_keys in models.items() %}
-            {% for key_name in required_keys %}
-              <div class="mb-3">
-                <label for="{{ key_name }}" class="form-label">{{ key_name }}</label>
-                <input type="password" class="form-control" id="{{ key_name }}" name="{{ key_name }}">
-              </div>
-            {% endfor %}
-          {% endfor %}
-          <div class="mb-3">
-            <label for="DATABASE_URL" class="form-label">DATABASE URL</label>
-            <input type="text" class="form-control" id="DATABASE_URL" name="DATABASE_URL">
-          </div>
-          <button type="submit" class="btn btn-primary btn-sm">Save Keys</button>
-        </form>
-      </div>
-    </div>
-  </div>
+<body class="is-boxed has-animations">
+    <div class="body-wrap">
+        <!-- Navigation -->
+        <div class="navbar">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/about" class="nav-link">About</a>
+            <a href="/contact" class="nav-link">Contact</a>
+            <a href="/main" class="nav-link">Scraper</a>
+            <a href="/login" class="nav-link">Login</a>
 </div>
 
-<!-- Model Selection -->
-<div class="mb-3 mt-3">
-  <label for="modelSelection" class="form-label">Select Model</label>
-  <select class="form-select" id="modelSelection" name="model_selection">
-    {% for model in models %}
-      <option value="{{ model }}">{{ model }}</option>
-    {% endfor %}
-  </select>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i class="fas fa-link"></i> URL Input
 </div>
-
-<!-- Gemini Settings -->
-<div id="geminiSettings" class="mb-3" style="display: none;">
-  <hr>
-  <h6>Gemini API Settings</h6>
-  <label for="maxOutputTokens" class="form-label">Max Output Tokens</label>
-  <input type="range" class="form-range" min="100" max="8192" step="100" value="2048" id="maxOutputTokens">
-  <div class="d-flex justify-content-between">
-    <small>100</small>
-    <small id="tokenValue">2048</small>
-    <small>8192</small>
-  </div>
-</div>
-
-<hr>
-
-<!-- URL Input Section -->
-<h5>URL Input Section</h5>
-<div class="mb-3">
-  <label for="urlTextarea" class="form-label">Enter one or more URLs:</label>
+                    <label class="form-label">Enter URLs to Scrape</label>
   <textarea class="form-control" id="urlTextarea" rows="3" placeholder="Enter URLs (space/tab/newline separated)"></textarea>
+                    <div class="button-group">
+                        <button id="addUrlsBtn" class="button">
+                            <i class="fas fa-plus"></i> Add URLs
+                        </button>
+                        <button id="clearUrlsBtn" class="button button-danger">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
 </div>
-<div class="mb-3">
-  <button id="addUrlsBtn" class="btn btn-primary btn-sm">Add URLs</button>
-  <button id="clearUrlsBtn" class="btn btn-danger btn-sm">Clear URLs</button>
-</div>
-
-<div class="mb-3">
-  <div class="form-label">Added URLs</div>
   <div id="urlBubbleContainer" class="url-bubble-container"></div>
 </div>
 
-<hr>
+                <div class="divider"></div>
 
-<!-- Fields to Extract -->
-<div class="mb-3 form-check">
+                <div class="sidebar-section">
+                    <div class="form-check">
   <input type="checkbox" class="form-check-input" id="enableScraping">
   <label class="form-check-label" for="enableScraping">Enable Scraping</label>
 </div>
 
 <div id="fieldsContainer" style="display: none;">
-  <div class="mb-3">
-    <label for="fieldInput" class="form-label">Enter Fields to Extract:</label>
-    <div class="input-group mb-3">
+                        <label class="form-label">Enter Fields to Extract</label>
+                        <div class="input-group">
       <input type="text" class="form-control" id="fieldInput" placeholder="Enter a field name">
-      <button class="btn btn-outline-secondary" type="button" id="addFieldBtn">Add</button>
+                            <button class="button" id="addFieldBtn">Add</button>
+                        </div>
+                        <div id="fieldsTagContainer" class="field-tag-container"></div>
     </div>
-  </div>
-  <div id="fieldsTagContainer"></div>
 </div>
 
-<hr>
+                <div class="divider"></div>
 
-<!-- Pagination -->
-<div class="mb-3 form-check">
+                <div class="sidebar-section">
+                    <div class="form-check">
   <input type="checkbox" class="form-check-input" id="enablePagination">
   <label class="form-check-label" for="enablePagination">Enable Pagination</label>
 </div>
 
 <div id="paginationContainer" style="display: none;">
-  <div class="mb-3">
-    <label for="paginationDetails" class="form-label">Enter Pagination Details (optional)</label>
+                        <label class="form-label">Pagination Details (optional)</label>
     <textarea class="form-control" id="paginationDetails" rows="2" placeholder="Describe how to navigate through pages"></textarea>
   </div>
 </div>
 
-<hr>
-
-<!-- Launch Button -->
-<div class="d-grid gap-2">
-  <button id="launchBtn" class="btn btn-primary btn-lg">LAUNCH</button>
+                <div class="divider"></div>
+                
+                <button id="launchBtn" class="button button-large">
+                    <i class="fas fa-rocket"></i> LAUNCH
+                </button>
 </div>
-{% endblock %}
-
-{% block content %}
-<div class="row mb-4">
-  <div class="col-lg-12">
-    <div class="card">
-      <div class="card-body">
-        <h1 class="card-title text-center mb-4">Web Scraper Pro <i class="fa-solid fa-spider text-primary"></i></h1>
-        <p class="text-center">Extract structured data from websites using AI. Configure your settings below and launch the scraper.</p>
-      </div>
-    </div>
-  </div>
+            
+            <!-- Main Content Area -->
+            <div class="content">
+                <div class="page-header">
+                    <h1>Web Scraper <i class="fas fa-spider"></i></h1>
+                    <p>Extract structured data from websites using AI. Configure settings and launch the scraper.</p>
 </div>
 
 <!-- Database Warning -->
-<div id="databaseWarning" class="alert alert-danger" role="alert" style="display: none;">
-  <h4 class="alert-heading">🚨 Database is not configured!</h4>
-  <p>This project requires a database to function.</p>
+                <div id="databaseWarning" class="alert alert-danger" style="display: none;">
+                    <h3 class="alert-heading">🚨 Database is not configured!</h3>
+                    <p>This project requires a database to function properly.</p>
   <hr>
-  <p class="mb-0">Follow these steps to set it up:</p>
+                    <p>Follow these steps to set it up:</p>
   <ol>
-    <li><strong>Create a <code>.env</code> file</strong> in the project root directory.</li>
-    <li><strong>Add the following to your <code>.env</code> file</strong>:
+                        <li>Create a <code>.env</code> file in the project root directory.</li>
+                        <li>Add the following to your <code>.env</code> file:
       <pre><code>DATABASE_URL=sqlite:///webscraped_data.db</code></pre>
     </li>
-    <li><strong>For production environments</strong>, you can use PostgreSQL or MySQL:
+                        <li>For production environments, you can use PostgreSQL or MySQL:
       <pre><code># PostgreSQL example
 DATABASE_URL=postgresql://username:password@localhost/dbname
 
 # MySQL example
 DATABASE_URL=mysql+pymysql://username:password@localhost/dbname</code></pre>
     </li>
-    <li><strong>Install required dependencies</strong>:
+                        <li>Install required dependencies:
       <pre><code>pip install sqlalchemy pymysql psycopg2-binary</code></pre>
     </li>
-    <li><strong>Restart the project</strong>, and you're good to go! 🚀</li>
+                        <li>Restart the project and you're good to go! 🚀</li>
   </ol>
 </div>
 
-<div id="errorAlert" class="alert alert-danger" style="display: none;" role="alert">
+                <!-- Error Alert -->
+                <div id="errorAlert" class="alert alert-danger" style="display: none;">
   <strong>Error!</strong> <span id="errorMessage"></span>
 </div>
 
-<!-- Main Configuration -->
-<div class="row">
-  <!-- URL Input Section -->
-  <div class="col-lg-6">
-    <div class="card">
-      <div class="card-header">
-        <i class="fas fa-link me-2"></i>URL Configuration
+                <!-- Feature Cards Section -->
+                <div class="features">
+                    <h2>How to Use the Web Scraper</h2>
+                    <div class="features-grid">
+                        <div class="feature-card fade-in">
+                            <div class="feature-card-header">
+                                <i class="fas fa-link"></i>
+                                <h3>Step 1: Add URLs</h3>
       </div>
-      <div class="card-body">
-        <div class="mb-3">
-          <label for="urlTextarea" class="form-label">Enter URLs to Scrape</label>
-          <textarea class="form-control" id="urlTextarea" rows="3" placeholder="Enter URLs (space/tab/newline separated)"></textarea>
+                            <p>Enter one or more URLs you want to scrape in the URL input section. These can be separated by spaces, tabs, or new lines.</p>
         </div>
-        <div class="mb-3">
-          <button id="addUrlsBtn" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Add URLs</button>
-          <button id="clearUrlsBtn" class="btn btn-outline-danger"><i class="fas fa-trash me-1"></i>Clear</button>
+                        
+                        <div class="feature-card fade-in">
+                            <div class="feature-card-header">
+                                <i class="fas fa-list-ul"></i>
+                                <h3>Step 2: Specify Fields</h3>
         </div>
-        <div class="mb-3">
-          <label class="form-label">Added URLs</label>
-          <div class="border rounded p-2 url-section">
-            <div id="urlBubbleContainer" class="d-flex flex-wrap"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+                            <p>Enable scraping and specify which data fields you want to extract from the web pages.</p>
   </div>
   
-  <!-- Model & Field Selection -->
-  <div class="col-lg-6">
-    <div class="card">
-      <div class="card-header">
-        <i class="fas fa-cog me-2"></i>Scraping Options
+                        <div class="feature-card fade-in">
+                            <div class="feature-card-header">
+                                <i class="fas fa-copy"></i>
+                                <h3>Step 3: Configure Pagination</h3>
       </div>
-      <div class="card-body">
-        <!-- Model Selection -->
-        <div class="mb-3">
-          <label for="modelSelection" class="form-label">Select AI Model</label>
-          <select class="form-select" id="modelSelection" name="model_selection">
-            {% for model in models %}
-              <option value="{{ model }}">{{ model }}</option>
-            {% endfor %}
-          </select>
+                            <p>If you need to scrape multiple pages, enable pagination and provide instructions on how to navigate between pages.</p>
         </div>
         
-        <!-- Gemini Settings -->
-        <div id="geminiSettings" class="mb-3 p-3 border rounded" style="display: none;">
-          <h6 class="mb-2">Gemini API Settings</h6>
-          <label for="maxOutputTokens" class="form-label">Max Output Tokens: <span id="tokenValue">2048</span></label>
-          <input type="range" class="form-range" min="100" max="8192" step="100" value="2048" id="maxOutputTokens">
-          <div class="d-flex justify-content-between">
-            <small>100</small>
-            <small>8192</small>
+                        <div class="feature-card fade-in">
+                            <div class="feature-card-header">
+                                <i class="fas fa-download"></i>
+                                <h3>Step 4: Launch & Export</h3>
+                            </div>
+                            <p>Click the Launch button to start scraping. Once complete, you can export the data in JSON or CSV format.</p>
           </div>
         </div>
         
-        <!-- Fields to Extract -->
-        <div class="mb-3 form-check">
-          <input type="checkbox" class="form-check-input" id="enableScraping">
-          <label class="form-check-label" for="enableScraping">Enable Data Extraction</label>
+                    <p class="features-note">The scraper uses advanced AI to intelligently parse web content and extract structured data based on your specified fields.</p>
         </div>
-        
-        <div id="fieldsContainer" style="display: none;">
-          <div class="mb-3">
-            <label for="fieldInput" class="form-label">Enter Fields to Extract</label>
-            <div class="input-group mb-3">
-              <input type="text" class="form-control" id="fieldInput" placeholder="Enter a field name">
-              <button class="btn btn-outline-primary" type="button" id="addFieldBtn">Add</button>
-            </div>
-          </div>
-          <div class="border rounded p-2 mb-3">
-            <div id="fieldsTagContainer" class="d-flex flex-wrap"></div>
           </div>
         </div>
         
-        <!-- Pagination -->
-        <div class="mb-3 form-check">
-          <input type="checkbox" class="form-check-input" id="enablePagination">
-          <label class="form-check-label" for="enablePagination">Enable Pagination</label>
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="site-footer-inner">
+                <div class="brand footer-brand">
+                    <a href="/">
+                        <img class="header-logo-image" src="/static/images/logo.svg" alt="Logo">
+                    </a>
         </div>
-        
-        <div id="paginationContainer" style="display: none;">
-          <div class="mb-3">
-            <label for="paginationDetails" class="form-label">Pagination Details</label>
-            <textarea class="form-control" id="paginationDetails" rows="2" placeholder="Describe how to navigate through pages"></textarea>
+                <ul class="footer-links list-reset">
+                    <li>
+                        <a href="/contact">Contact</a>
+                    </li>
+                    <li>
+                        <a href="/about">About us</a>
+                    </li>
+                    <li>
+                        <a href="/">FAQ's</a>
+                    </li>
+                    <li>
+                        <a href="/">Support</a>
+                    </li>
+                </ul>
+                <ul class="footer-social-links list-reset">
+                    <li>
+                        <a href="#">
+                            <span class="screen-reader-text">Facebook</span>
+                            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.023 16L6 9H3V6h3V4c0-2.7 1.672-4 4.08-4 1.153 0 2.144.086 2.433.124v2.821h-1.67c-1.31 0-1.563.623-1.563 1.536V6H13l-1 3H9.28v7H6.023z" fill="#0270D7" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="screen-reader-text">Twitter</span>
+                            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 3c-.6.3-1.2.4-1.9.5.7-.4 1.2-1 1.4-1.8-.6.4-1.3.6-2.1.8-.6-.6-1.5-1-2.4-1-1.7 0-3.2 1.5-3.2 3.3 0 .3 0 .5.1.7-2.7-.1-5.2-1.4-6.8-3.4-.3.5-.4 1-.4 1.7 0 1.1.6 2.1 1.5 2.7-.5 0-1-.2-1.5-.4C.7 7.7 1.8 9 3.3 9.3c-.3.1-.6.1-.9.1-.2 0-.4 0-.6-.1.4 1.3 1.6 2.3 3.1 2.3-1.1.9-2.5 1.4-4.1 1.4H0c1.5.9 3.2 1.5 5 1.5 6 0 9.3-5 9.3-9.3v-.4C15 4.3 15.6 3.7 16 3z" fill="#0270D7" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="screen-reader-text">Google</span>
+                            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.9 7v2.4H12c-.2 1-1.2 3-4 3-2.4 0-4.3-2-4.3-4.4 0-2.4 2-4.4 4.3-4.4 1.4 0 2.3.6 2.8 1.1l1.9-1.8C11.5 1.7 9.9 1 8 1 4.1 1 1 4.1 1 8s3.1 7 7 7c4 0 6.7-2.8 6.7-6.8 0-.5 0-.8-.1-1.2H7.9z" fill="#0270D7" />
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+                <div class="footer-copyright">&copy; 2025 ScrapEase all rights reserved</div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
+        </footer>
 </div>
 
-<!-- Launch Button -->
-<div class="row mb-5">
-  <div class="col-12">
-    <div class="d-grid gap-2">
-      <button id="launchBtn" class="btn btn-lg btn-success">
-        <i class="fas fa-rocket me-2"></i>Start Scraping
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Loading Spinner -->
-<div id="loadingSpinner" style="display: none;">
-  <div class="d-flex justify-content-center my-5">
-    <div class="card w-100">
-      <div class="card-body text-center p-5">
-        <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <h4 class="mt-3">Processing Your Request</h4>
-        <p class="text-muted">This may take a few moments while we extract data from the provided URLs...</p>
-        <div class="progress mt-3">
-          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Feature Information -->
-<div class="row mb-4">
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body text-center">
-        <div class="feature-icon">
-          <i class="fas fa-robot"></i>
-        </div>
-        <h5 class="card-title">AI-Powered</h5>
-        <p class="card-text">Extract structured data using advanced AI models that understand content context.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body text-center">
-        <div class="feature-icon">
-          <i class="fas fa-table"></i>
-        </div>
-        <h5 class="card-title">Structured Output</h5>
-        <p class="card-text">Get clean, structured data in table format ready for analysis or export to CSV/JSON.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body text-center">
-        <div class="feature-icon">
-          <i class="fas fa-database"></i>
-        </div>
-        <h5 class="card-title">Data Storage</h5>
-        <p class="card-text">Results automatically saved to your database for future reference and analysis.</p>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
+    <script src="/static/main.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $(document).ready(function() {
-    // Check if database is initialized
-    if ("{{ db_initialized }}" === "False") {
+            // Check database configuration
+            $.ajax({
+                url: '/check_db',
+                type: 'GET',
+                success: function(response) {
+                    if (response.status === 'error') {
       $('#databaseWarning').show();
     }
-    
-    // Show Gemini settings if model includes "gemini"
-    $('#modelSelection').change(function() {
-      if ($(this).val().toLowerCase().includes('gemini')) {
-        $('#geminiSettings').show();
-      } else {
-        $('#geminiSettings').hide();
-      }
-    }).trigger('change');
-    
-    // Update token value display
-    $('#maxOutputTokens').on('input', function() {
-      $('#tokenValue').text($(this).val());
+                }
+            });
+            
+            // Toggle accordion
+            $('.accordion-header').on('click', function() {
+                $(this).toggleClass('active');
+                $(this).next('.accordion-content').slideToggle(300);
     });
     
-    // Toggle fields container
-    $('#enableScraping').change(function() {
+            // Enable scraping checkbox
+            $('#enableScraping').on('change', function() {
       if ($(this).is(':checked')) {
-        $('#fieldsContainer').show();
+                    $('#fieldsContainer').slideDown();
       } else {
-        $('#fieldsContainer').hide();
+                    $('#fieldsContainer').slideUp();
       }
     });
     
-    // Toggle pagination container
-    $('#enablePagination').change(function() {
+            // Enable pagination checkbox
+            $('#enablePagination').on('change', function() {
       if ($(this).is(':checked')) {
-        $('#paginationContainer').show();
+                    $('#paginationContainer').slideDown();
       } else {
-        $('#paginationContainer').hide();
+                    $('#paginationContainer').slideUp();
       }
     });
     
-    // Handle URL input
-    const urls = [];
-    
-    function updateUrlBubbles() {
-      const container = $('#urlBubbleContainer');
-      container.empty();
-      
-      if (urls.length === 0) {
-        container.html('<span class="text-muted fst-italic">No URLs added yet</span>');
-        return;
-      }
-      
-      urls.forEach(function(url, index) {
-        const bubble = $('<div class="url-bubble"></div>').text(url);
-        const deleteBtn = $('<span class="delete-url"><i class="fas fa-times"></i></span>');
-        
-        deleteBtn.click(function() {
-          urls.splice(index, 1);
-          updateUrlBubbles();
-        });
-        
-        bubble.append(deleteBtn);
-        container.append(bubble);
+            // Add URLs function
+            $('#addUrlsBtn').on('click', function() {
+                const urlsText = $('#urlTextarea').val().trim();
+                if (!urlsText) return;
+                
+                // Split by spaces, tabs, new lines
+                const urls = urlsText.split(/[\s\n\t]+/).filter(url => url);
+                
+                urls.forEach(url => {
+                    if (url && isValidURL(url)) {
+                        addUrlBubble(url);
+                    } else {
+                        showError(`Invalid URL: ${url}`);
+                    }
+                });
+                
+                $('#urlTextarea').val('');
+            });
+            
+            // Clear URLs function
+            $('#clearUrlsBtn').on('click', function() {
+                $('#urlBubbleContainer').empty();
       });
-    }
     
-    $('#addUrlsBtn').click(function() {
-      const urlText = $('#urlTextarea').val().trim();
-      if (urlText) {
-        const newUrls = urlText.split(/\s+/).filter(url => url);
-        urls.push(...newUrls);
-        $('#urlTextarea').val('');
-        updateUrlBubbles();
-      }
-    });
-    
-    $('#clearUrlsBtn').click(function() {
-      urls.length = 0;
-      updateUrlBubbles();
-    });
-    
-    // Initialize URL bubbles
-    updateUrlBubbles();
-    
-    // Handle fields input
-    const fields = [];
-    
-    function updateFieldTags() {
-      const container = $('#fieldsTagContainer');
-      container.empty();
-      
-      if (fields.length === 0) {
-        container.html('<span class="text-muted fst-italic">No fields added yet</span>');
-        return;
-      }
-      
-      fields.forEach(function(field, index) {
-        const tag = $('<div class="field-tag"></div>').text(field);
-        const deleteBtn = $('<span class="delete-url"><i class="fas fa-times"></i></span>');
-        
-        deleteBtn.click(function() {
-          fields.splice(index, 1);
-          updateFieldTags();
-        });
-        
-        tag.append(deleteBtn);
-        container.append(tag);
-      });
-    }
-    
-    // Initialize field tags
-    updateFieldTags();
-    
-    $('#addFieldBtn').click(function() {
+            // Add field button
+            $('#addFieldBtn').on('click', function() {
       const field = $('#fieldInput').val().trim();
       if (field) {
-        fields.push(field);
+                    addFieldTag(field);
         $('#fieldInput').val('');
-        updateFieldTags();
       }
     });
     
-    $('#fieldInput').keypress(function(e) {
-      if (e.which === 13) { // Enter key
-        e.preventDefault();
-        $('#addFieldBtn').click();
-      }
+            // Launch button
+            $('#launchBtn').on('click', function() {
+                // Get URLs
+                const urls = [];
+                $('.url-bubble').each(function() {
+                    urls.push($(this).data('url'));
     });
     
-    // API Keys form
-    $('#apiKeysForm').submit(function(e) {
-      e.preventDefault();
-      
-      $.ajax({
-        url: '/api_keys',
-        type: 'POST',
-        data: $(this).serialize(),
-        success: function(response) {
-          if (response.status === 'success') {
-            alert('API keys updated successfully!');
-          }
-        }
-      });
-    });
-    
-    // Launch button
-    $('#launchBtn').click(function() {
-      // Validation
       if (urls.length === 0) {
-        showNotification('Please enter at least one URL.', 'danger');
+                    showError('Please add at least one URL');
         return;
       }
       
-      if ($('#enableScraping').is(':checked') && fields.length === 0) {
-        showNotification('Please enter at least one field to extract.', 'danger');
+                // Get fields if scraping enabled
+                const enableScraping = $('#enableScraping').is(':checked');
+                const fields = [];
+                if (enableScraping) {
+                    $('.field-tag').each(function() {
+                        fields.push($(this).data('field'));
+                    });
+                    
+                    if (fields.length === 0) {
+                        showError('Please add at least one field to extract');
         return;
       }
-      
-      // Show loading spinner
-      $('#loadingSpinner').show();
+                }
+                
+                // Get pagination details if enabled
+                const enablePagination = $('#enablePagination').is(':checked');
+                const paginationDetails = enablePagination ? $('#paginationDetails').val() : '';
+                
+                // Set default model and tokens
+                const modelSelection = 'gemini/gemini-1.5-flash'; // Changed to gemini
+                const maxOutputTokens = 8192; // Increased token value for more data
+                
+                // Show loading state
+                const originalBtnText = $(this).html();
+                $(this).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                $(this).prop('disabled', true);
       
       // Prepare form data
       const formData = new FormData();
-      
-      // Add URLs
-      urls.forEach(url => {
-        formData.append('urls[]', url);
-      });
-      
-      // Add fields
-      fields.forEach(field => {
-        formData.append('fields[]', field);
-      });
-      
-      // Add other form data
-      formData.append('model_selection', $('#modelSelection').val());
-      formData.append('use_pagination', $('#enablePagination').is(':checked'));
-      formData.append('pagination_details', $('#paginationDetails').val());
-      
-      if ($('#modelSelection').val().toLowerCase().includes('gemini')) {
-        formData.append('max_output_tokens', $('#maxOutputTokens').val());
-      }
-      
-      // Send AJAX request
+                urls.forEach(url => formData.append('urls[]', url));
+                fields.forEach(field => formData.append('fields[]', field));
+                formData.append('model_selection', modelSelection);
+                formData.append('use_pagination', enablePagination.toString());
+                formData.append('pagination_details', paginationDetails);
+                formData.append('max_output_tokens', maxOutputTokens);
+                
+                // Debug log the data being sent
+                console.log('Sending form data:', {
+                    urls: urls,
+                    fields: fields,
+                    model_selection: modelSelection,
+                    use_pagination: enablePagination,
+                    pagination_details: paginationDetails,
+                    max_output_tokens: maxOutputTokens
+                });
+                
+                // Submit the form
       $.ajax({
         url: '/scrape',
         type: 'POST',
@@ -574,22 +876,130 @@ DATABASE_URL=mysql+pymysql://username:password@localhost/dbname</code></pre>
         processData: false,
         contentType: false,
         success: function(response) {
-          $('#loadingSpinner').hide();
-          
-          if (response.status === 'success') {
+                        console.log('Success response:', response);
+                        if (response && response.status === 'success') {
             window.location.href = '/results';
           } else {
-            $('#errorMessage').text(response.message);
-            $('#errorAlert').show();
+                            showError('Scraping completed but with issues');
+                            $('#launchBtn').html(originalBtnText);
+                            $('#launchBtn').prop('disabled', false);
           }
         },
         error: function(xhr, status, error) {
-          $('#loadingSpinner').hide();
-          $('#errorMessage').text('An error occurred: ' + error);
-          $('#errorAlert').show();
+                        console.error('Error:', error, xhr.responseText);
+                        let errorMsg = 'An error occurred during scraping';
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            errorMsg = response.message || errorMsg;
+                        } catch (e) {}
+                        
+                        showError(errorMsg);
+                        $('#launchBtn').html(originalBtnText);
+                        $('#launchBtn').prop('disabled', false);
         }
       });
     });
+            
+            // Helper function to add URL bubble
+            function addUrlBubble(url) {
+                // Check if URL already exists
+                let exists = false;
+                $('.url-bubble').each(function() {
+                    if ($(this).data('url') === url) {
+                        exists = true;
+                        return false;
+                    }
+                });
+                
+                if (exists) return;
+                
+                const bubble = $(`
+                    <div class="url-bubble" data-url="${url}">
+                        ${truncateString(url, 30)}
+                        <i class="fas fa-times delete-url"></i>
+                    </div>
+                `);
+                
+                $('#urlBubbleContainer').append(bubble);
+                
+                // Delete URL
+                bubble.find('.delete-url').on('click', function() {
+                    $(this).parent().remove();
+                });
+            }
+            
+            // Helper function to add field tag
+            function addFieldTag(field) {
+                // Check if field already exists
+                let exists = false;
+                $('.field-tag').each(function() {
+                    if ($(this).data('field') === field) {
+                        exists = true;
+                        return false;
+                    }
+                });
+                
+                if (exists) return;
+                
+                const tag = $(`
+                    <div class="field-tag" data-field="${field}">
+                        ${field}
+                        <i class="fas fa-times delete-field"></i>
+                    </div>
+                `);
+                
+                $('#fieldsTagContainer').append(tag);
+                
+                // Delete field
+                tag.find('.delete-field').on('click', function() {
+                    $(this).parent().remove();
+                });
+            }
+            
+            // Helper function to show error
+            function showError(message) {
+                $('#errorMessage').text(message);
+                $('#errorAlert').fadeIn();
+                setTimeout(() => {
+                    $('#errorAlert').fadeOut();
+                }, 5000);
+            }
+            
+            // Helper function to validate URL
+            function isValidURL(string) {
+                try {
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+            
+            // Helper function to truncate string
+            function truncateString(str, num) {
+                if (str.length <= num) {
+                    return str;
+                }
+                return str.slice(0, num) + '...';
+            }
+
+            // Enter key for URL textarea
+            $('#urlTextarea').on('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    $('#addUrlsBtn').click();
+                }
+            });
+            
+            // Enter key for field input
+            $('#fieldInput').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $('#addFieldBtn').click();
+                }
+            });
   });
 </script>
-{% endblock %} 
+</body>
+
+</html>

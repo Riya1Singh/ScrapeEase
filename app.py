@@ -4,13 +4,16 @@ import os
 import sys
 import asyncio
 import pandas as pd
-from io import StringIO
+from io import BytesIO
 import os
 from datetime import datetime
 from auth import auth_bp, User
 from models import db
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required
+import warnings
+warnings.filterwarnings("ignore",module="streamlit")
+
 
 
 # Import functions from the original project
@@ -47,8 +50,8 @@ def contact():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get['username']
-        password = request.form.get['password']
+        username = request.form.get('username')
+        password = request.form.get('password')
         return "login submitted!"
     return render_template('login.html')
         
@@ -70,6 +73,13 @@ def fromjson(value):
         return json.loads(value)
     except (ValueError, TypeError):
         return {}
+
+@app.template_filter('get_item')
+def get_item(obj, key):
+    """Get an item from an object safely"""
+    if isinstance(obj, dict):
+        return obj.get(key, '')
+    return ''
 
 # Add now() function to Jinja environment
 @app.context_processor
@@ -97,10 +107,10 @@ def scrape():
     # Get form data
     urls = request.form.getlist('urls[]')
     fields = request.form.getlist('fields[]')
-    model_selection = request.form.get('model_selection')
+    model_selection = request.form.get('model_selection', 'gemini')  # Default model changed to gemini
     use_pagination = request.form.get('use_pagination') == 'true'
     pagination_details = request.form.get('pagination_details', '')
-    max_output_tokens = int(request.form.get('max_output_tokens', 2048))
+    max_output_tokens = int(request.form.get('max_output_tokens', 8192))  # Increased to 8192 to handle more data
     
     # Store in session
     session['urls'] = urls
@@ -112,8 +122,16 @@ def scrape():
     
     # Process data
     try:
+        print(f"Starting scraping process for {len(urls)} URLs with fields: {fields}")
+        
+        if not urls:
+            raise ValueError("No URLs provided")
+            
         # Fetch or reuse the markdown for each URL
         unique_names = fetch_and_store_markdowns(urls)
+        if not unique_names:
+            raise ValueError("Failed to process URLs")
+            
         session['unique_names'] = unique_names
         
         total_input_tokens = 0
@@ -121,6 +139,8 @@ def scrape():
         total_cost = 0
         all_data = []
         pagination_info = None
+        
+        print(f"Successfully processed {len(unique_names)} unique URLs")
         
         # 1) Scraping logic
         if fields:
@@ -139,28 +159,38 @@ def scrape():
             for item in parsed_data:
                 if isinstance(item, dict):
                     # If it's already a dictionary, keep it as is
-                    processed_item = item
+                    parsed = json.loads(item["parsed_data"]) if isinstance(item["parsed_data"], str) else item["parsed_data"]
+                    if "listings" in parsed:
+                        item["parsed_data"] = parsed
+                        processed_item = item
+                    else:
+                        processed_item = {"parsed_data": {"listings": [parsed]}}
                 elif isinstance(item, str):
                     # If it's a string, try to parse it as JSON
                     try:
-                        processed_item = json.loads(item)
-                        # Print out what was successfully parsed for debugging
+                        parsed = json.loads(item)
+                        if "listings" in parsed:
+                            processed_item = {"parsed_data": parsed}
+                        else:
+                            processed_item = {"parsed_data": {"listings": [parsed]}}
                         print(f"Successfully parsed JSON string: {type(processed_item)}")
                     except json.JSONDecodeError:
-                        # If not valid JSON, keep as string
-                        processed_item = {"parsed_data": item}
+                        processed_item = {"parsed_data": {"listings": [{"content": item}]}}
                         print(f"Failed to parse as JSON, keeping as string")
                 else:
-                    # For any other type, convert to a dict
-                    processed_item = {"parsed_data": item}
+                    processed_item = {"parsed_data": {"listings": [{"content": str(item)}]}}
                     print(f"Non-string, non-dict item: {type(item)}")
                 
                 processed_data.append(processed_item)
             
-            # Debug print to see the structure
-            print("PROCESSED DATA STRUCTURE:", processed_data[:1])
-            
+            # Debug print to see the structure and concatenate listings from all URLs
+            total_listings = 0
+            for pd in processed_data:
+                if "listings" in pd["parsed_data"]:
+                    total_listings += len(pd["parsed_data"]["listings"])
+            print(f"PROCESSED DATA STRUCTURE: Total listings across all URLs: {total_listings}")
             all_data = processed_data
+            print(all_data)
             session['in_tokens_s'] = in_tokens_s
             session['out_tokens_s'] = out_tokens_s
             session['cost_s'] = cost_s
@@ -177,20 +207,35 @@ def scrape():
             total_input_tokens += in_tokens_p
             total_output_tokens += out_tokens_p
             total_cost += cost_p
-            
             pagination_info = page_results
+            pagination_info[0]["pagination_data"] = json.loads(pagination_info[0]["pagination_data"]) if isinstance(pagination_info[0]["pagination_data"], str) else pagination_info[0]["pagination_data"]
+            
+            
+            print("Pagination results:", pagination_info)
+            
             session['in_tokens_p'] = in_tokens_p
             session['out_tokens_p'] = out_tokens_p
             session['cost_p'] = cost_p
         
         # Save results to session
-        session['results'] = {
-            'data': all_data,
-            'input_tokens': total_input_tokens,
-            'output_tokens': total_output_tokens,
-            'total_cost': total_cost,
-            'pagination_info': pagination_info
-        }
+        try:
+            # parsed_data = json.loads(all_data) if isinstance(all_data, str) else all_data
+            session['results'] = {
+                'data': all_data,
+                'input_tokens': total_input_tokens,
+                'output_tokens': total_output_tokens,
+                'total_cost': total_cost,
+                'pagination_info': pagination_info
+            }
+        except json.JSONDecodeError as e:
+            print(f"Error parsing scraped data: {str(e)}")
+            session['results'] = {
+                'data': [],
+                'input_tokens': total_input_tokens,
+                'output_tokens': total_output_tokens,
+                'total_cost': total_cost,
+                'pagination_info': pagination_info.get('page_urls', []) if isinstance(pagination_info, dict) else []
+            }
         
         return jsonify({'status': 'success', 'message': 'Scraping completed successfully!'})
     except Exception as e:
@@ -222,13 +267,13 @@ def download_json():
             indent=4
         )
         
-        # Create a StringIO object
-        string_io = StringIO(json_data)
-        string_io.seek(0)  # Ensure cursor is at the beginning
+        # Create a BytesIO object
+        bytes_io = BytesIO(json_data.encode('utf-8'))
+        bytes_io.seek(0)  # Ensure cursor is at the beginning
         
         # Return the file
         return send_file(
-            string_io,
+            bytes_io,
             mimetype='application/json',
             as_attachment=True,
             download_name='scraped_data.json'
@@ -280,14 +325,14 @@ def download_csv():
         
         # Convert to DataFrame
         combined_df = pd.DataFrame(all_listings)
-        csv_data = combined_df.to_csv(index=False)
+        csv_data = combined_df.to_csv(index=False).encode('utf-8')
         
-        # Create a StringIO object
-        string_io = StringIO(csv_data)
-        string_io.seek(0)  # Ensure cursor is at the beginning
+        # Create a BytesIO object
+        bytes_io = BytesIO(csv_data)
+        bytes_io.seek(0)  # Ensure cursor is at the beginning
         
         return send_file(
-            string_io,
+            bytes_io,
             mimetype='text/csv',
             as_attachment=True,
             download_name='scraped_data.csv'
@@ -348,14 +393,14 @@ def download_pagination_csv():
             all_page_rows = [{"empty": "No pagination URLs available"}]
         
         pagination_df = pd.DataFrame(all_page_rows)
-        csv_data = pagination_df.to_csv(index=False)
+        csv_data = pagination_df.to_csv(index=False).encode('utf-8')
         
-        # Create a StringIO object
-        string_io = StringIO(csv_data)
-        string_io.seek(0)  # Ensure cursor is at the beginning
+        # Create a BytesIO object
+        bytes_io = BytesIO(csv_data)
+        bytes_io.seek(0)  # Ensure cursor is at the beginning
         
         return send_file(
-            string_io,
+            bytes_io,
             mimetype='text/csv',
             as_attachment=True,
             download_name='pagination_urls.csv'
@@ -417,12 +462,12 @@ def download_pagination_json():
         
         json_data = json.dumps(all_page_rows, indent=4)
         
-        # Create a StringIO object
-        string_io = StringIO(json_data)
-        string_io.seek(0)  # Ensure cursor is at the beginning
+        # Create a BytesIO object
+        bytes_io = BytesIO(json_data.encode('utf-8'))
+        bytes_io.seek(0)  # Ensure cursor is at the beginning
         
         return send_file(
-            string_io,
+            bytes_io,
             mimetype='application/json',
             as_attachment=True,
             download_name='pagination_urls.json'
