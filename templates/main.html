@@ -1,178 +1,1005 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <style>
-    .content-box {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      padding: 10px;
-      background-color: #f8f9fa;
-      border-radius: 4px;
-    }
-  </style>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ScrapEase - Main</title>
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,600" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <script src="https://unpkg.com/animejs@3.0.1/lib/anime.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
+<style>
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #151719;
+            color: #9BA9B4;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background-color: transparent;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            padding: 10px 0;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .navbar a::before {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background-color: #00bcd4;
+            transition: width 0.3s ease, left 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .navbar a:hover {
+            color: #00bcd4;
+            transform: scale(1.1);
+        }
+
+        .navbar a:hover::before {
+            width: 100%;
+            left: 0;
+        }
+
+        /* Body wrap */
+        .body-wrap {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Main content layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 120px 20px 60px 20px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            background-color: #202B36;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            height: fit-content;
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-title i {
+            margin-right: 10px;
+            color: #0270D7;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #2E3237;
+            margin: 20px 0;
+        }
+
+        /* Content area styling */
+        .content {
+            background-color: #202B36;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            color: #0270D7;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: #9BA9B4;
+            font-size: 1.1rem;
+        }
+
+        /* Form elements styling */
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: #151719;
+            border: 2px solid #2E3237;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #0270D7;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            background: #151719;
+            border: 2px solid #2E3237;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #0270D7;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            accent-color: #0270D7;
+        }
+
+        .form-check-label {
+            color: #fff;
+            font-size: 14px;
+        }
+
+        /* Range input styling */
+        .form-range {
+            width: 100%;
+            height: 8px;
+            padding: 0;
+            background: #2E3237;
+            border-radius: 5px;
+            appearance: none;
+            margin-bottom: 10px;
+        }
+
+        .form-range::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #0270D7;
+            cursor: pointer;
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            color: #9BA9B4;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Button styling */
+        .button {
+            padding: 12px 25px;
+            background-color: #0270D7;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .button:hover {
+            background-color: #0F8AFD;
+            transform: translateY(-2px);
+        }
+
+        .button i {
+            margin-right: 8px;
+        }
+
+        .button-secondary {
+            background-color: transparent;
+            border: 2px solid #0270D7;
+            color: #0270D7;
+        }
+
+        .button-secondary:hover {
+            background-color: rgba(2, 112, 215, 0.1);
+  }
+  
+        .button-danger {
+            background-color: #E5363A;
+        }
+
+        .button-danger:hover {
+            background-color: #F05356;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .button-large {
+            padding: 15px 30px;
+            font-size: 18px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* URL bubbles styling */
+  .url-bubble-container {
+            min-height: 50px;
+            border: 1px dashed #2E3237;
+    border-radius: 5px;
+    padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+  }
+  
+        .url-bubble {
+            background-color: rgba(2, 112, 215, 0.1);
+            color: #0270D7;
+            border-radius: 20px;
+            padding: 8px 12px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .url-bubble i {
+            margin-left: 8px;
+    cursor: pointer;
+            color: #E5363A;
+        }
+
+        /* Field tags styling */
+        .field-tag-container {
+            min-height: 50px;
+            border: 1px dashed #2E3237;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+  }
+  
+  .field-tag {
+            background-color: rgba(2, 112, 215, 0.1);
+            color: #0270D7;
+            border-radius: 20px;
+            padding: 8px 12px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .field-tag i {
+            margin-left: 8px;
+            cursor: pointer;
+            color: #E5363A;
+        }
+
+        /* Input group */
+        .input-group {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .input-group .form-control {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            margin-bottom: 0;
+        }
+
+        .input-group .button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            padding: 0 15px;
+        }
+
+        /* Accordion styling */
+        .accordion {
+            margin-bottom: 20px;
+        }
+
+        .accordion-header {
+            background: #2E3237;
+            padding: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: #3E454F;
+  }
+  
+        .accordion-header i {
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-header.active i {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            background: #151719;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .accordion-content.active {
+            display: block;
+        }
+
+        /* Alert styling */
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #fff;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .alert-danger {
+            background-color: rgba(229, 54, 58, 0.2);
+            border: 1px solid #E5363A;
+        }
+
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+        }
+
+        .alert-heading {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        /* Footer styling */
+        .site-footer {
+            background: #202B36;
+            padding: 40px 0;
+            margin-top: auto;
+        }
+        
+        .site-footer-inner {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer-brand {
+    margin-bottom: 24px;
+  }
+  
+        .footer-links {
+            display: flex;
+            margin-bottom: 24px;
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-links li {
+            margin-right: 24px;
+        }
+        
+        .footer-links a {
+            color: #9BA9B4;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        
+        .footer-links a:hover {
+            color: #fff;
+        }
+        
+        .footer-social-links {
+            display: flex;
+            margin-bottom: 24px;
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-social-links li {
+            margin-right: 16px;
+  }
+  
+        .footer-social-links a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #323D48;
+            transition: background 0.15s ease;
+            text-decoration: none;
+  }
+  
+        .footer-social-links a:hover {
+            background: #0270D7;
+        }
+        
+        .footer-copyright {
+            color: #9BA9B4;
+            font-size: 14px;
+            line-height: 22px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+  }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+  }
+</style>
 </head>
 
-<body>
-  <div class="container mt-5">
-    <h1 class="mb-4">AI Web Scraper</h1>
+<body class="is-boxed has-animations">
+    <div class="body-wrap">
+        <!-- Navigation -->
+        <div class="navbar">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/about" class="nav-link">About</a>
+            <a href="/contact" class="nav-link">Contact</a>
+            <a href="/main" class="nav-link">Scraper</a>
+            <a href="/login" class="nav-link">Login</a>
+</div>
 
-    <!-- Step 1: Scrape Website -->
-    <div class="card mb-4">
-      <div class="card-body">
-        <h5 class="card-title">Step 1: Scrape Website</h5>
-        <div class="mb-3">
-          <input type="text" id="url" class="form-control" placeholder="Enter Website URL">
-        </div>
-        <button onclick="scrapeWebsite()" class="btn btn-primary">Scrape Website</button>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">
+                        <i class="fas fa-link"></i> URL Input
+</div>
+                    <label class="form-label">Enter URLs to Scrape</label>
+  <textarea class="form-control" id="urlTextarea" rows="3" placeholder="Enter URLs (space/tab/newline separated)"></textarea>
+                    <div class="button-group">
+                        <button id="addUrlsBtn" class="button">
+                            <i class="fas fa-plus"></i> Add URLs
+                        </button>
+                        <button id="clearUrlsBtn" class="button button-danger">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+</div>
+  <div id="urlBubbleContainer" class="url-bubble-container"></div>
+</div>
 
-        <div id="scrapeResult" class="content-box mt-3" style="display: none;"></div>
-      </div>
+                <div class="divider"></div>
+
+                <div class="sidebar-section">
+                    <div class="form-check">
+  <input type="checkbox" class="form-check-input" id="enableScraping">
+  <label class="form-check-label" for="enableScraping">Enable Scraping</label>
+</div>
+
+<div id="fieldsContainer" style="display: none;">
+                        <label class="form-label">Enter Fields to Extract</label>
+                        <div class="input-group">
+      <input type="text" class="form-control" id="fieldInput" placeholder="Enter a field name">
+                            <button class="button" id="addFieldBtn">Add</button>
+                        </div>
+                        <div id="fieldsTagContainer" class="field-tag-container"></div>
     </div>
+</div>
 
-    <!-- Step 2: Parse Content -->
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Step 2: Ask Questions About the Content</h5>
-        <div class="mb-3">
-          <textarea id="parseDescription" class="form-control" rows="3"
-            placeholder="Describe what you want to parse"></textarea>
-        </div>
-        <button onclick="parseContent()" class="btn btn-primary">Parse Content</button>
+                <div class="divider"></div>
 
-        <div id="parseResult" class="content-box mt-3" style="display: none;"></div>
-      </div>
-    </div>
+                <div class="sidebar-section">
+                    <div class="form-check">
+  <input type="checkbox" class="form-check-input" id="enablePagination">
+  <label class="form-check-label" for="enablePagination">Enable Pagination</label>
+</div>
+
+<div id="paginationContainer" style="display: none;">
+                        <label class="form-label">Pagination Details (optional)</label>
+    <textarea class="form-control" id="paginationDetails" rows="2" placeholder="Describe how to navigate through pages"></textarea>
   </div>
+</div>
 
-  <script>
-    async function scrapeWebsite() {
-      const url = document.getElementById('url').value;
-      const prompt = document.getElementById('parseDescription').value;
-      const resultDiv = document.getElementById('scrapeResult');
-      if (!url || !prompt) {
-        alert('Please enter both URL and prompt');
+                <div class="divider"></div>
+                
+                <button id="launchBtn" class="button button-large">
+                    <i class="fas fa-rocket"></i> LAUNCH
+                </button>
+</div>
+            
+            <!-- Main Content Area -->
+            <div class="content">
+                <div class="page-header">
+                    <h1>Web Scraper <i class="fas fa-spider"></i></h1>
+                    <p>Extract structured data from websites using AI. Configure settings and launch the scraper.</p>
+</div>
+
+<!-- Database Warning -->
+                <div id="databaseWarning" class="alert alert-danger" style="display: none;">
+                    <h3 class="alert-heading">🚨 Database is not configured!</h3>
+                    <p>This project requires a database to function properly.</p>
+  <hr>
+                    <p>Follow these steps to set it up:</p>
+  <ol>
+                        <li>Create a <code>.env</code> file in the project root directory.</li>
+                        <li>Add the following to your <code>.env</code> file:
+      <pre><code>DATABASE_URL=sqlite:///webscraped_data.db</code></pre>
+    </li>
+                        <li>For production environments, you can use PostgreSQL or MySQL:
+      <pre><code># PostgreSQL example
+DATABASE_URL=postgresql://username:password@localhost/dbname
+
+# MySQL example
+DATABASE_URL=mysql+pymysql://username:password@localhost/dbname</code></pre>
+    </li>
+                        <li>Install required dependencies:
+      <pre><code>pip install sqlalchemy pymysql psycopg2-binary</code></pre>
+    </li>
+                        <li>Restart the project and you're good to go! 🚀</li>
+  </ol>
+</div>
+
+                <!-- Error Alert -->
+                <div id="errorAlert" class="alert alert-danger" style="display: none;">
+  <strong>Error!</strong> <span id="errorMessage"></span>
+</div>
+
+                <!-- Feature Cards Section -->
+                <div class="features">
+                    <h2>How to Use the Web Scraper</h2>
+                    <div class="features-grid">
+                        <div class="feature-card fade-in">
+                            <div class="feature-card-header">
+                                <i class="fas fa-link"></i>
+                                <h3>Step 1: Add URLs</h3>
+      </div>
+                            <p>Enter one or more URLs you want to scrape in the URL input section. These can be separated by spaces, tabs, or new lines.</p>
+        </div>
+                        
+                        <div class="feature-card fade-in">
+                            <div class="feature-card-header">
+                                <i class="fas fa-list-ul"></i>
+                                <h3>Step 2: Specify Fields</h3>
+        </div>
+                            <p>Enable scraping and specify which data fields you want to extract from the web pages.</p>
+  </div>
+  
+                        <div class="feature-card fade-in">
+                            <div class="feature-card-header">
+                                <i class="fas fa-copy"></i>
+                                <h3>Step 3: Configure Pagination</h3>
+      </div>
+                            <p>If you need to scrape multiple pages, enable pagination and provide instructions on how to navigate between pages.</p>
+        </div>
+        
+                        <div class="feature-card fade-in">
+                            <div class="feature-card-header">
+                                <i class="fas fa-download"></i>
+                                <h3>Step 4: Launch & Export</h3>
+                            </div>
+                            <p>Click the Launch button to start scraping. Once complete, you can export the data in JSON or CSV format.</p>
+          </div>
+        </div>
+        
+                    <p class="features-note">The scraper uses advanced AI to intelligently parse web content and extract structured data based on your specified fields.</p>
+        </div>
+          </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="site-footer-inner">
+                <div class="brand footer-brand">
+                    <a href="/">
+                        <img class="header-logo-image" src="/static/images/logo.svg" alt="Logo">
+                    </a>
+        </div>
+                <ul class="footer-links list-reset">
+                    <li>
+                        <a href="/contact">Contact</a>
+                    </li>
+                    <li>
+                        <a href="/about">About us</a>
+                    </li>
+                    <li>
+                        <a href="/">FAQ's</a>
+                    </li>
+                    <li>
+                        <a href="/">Support</a>
+                    </li>
+                </ul>
+                <ul class="footer-social-links list-reset">
+                    <li>
+                        <a href="#">
+                            <span class="screen-reader-text">Facebook</span>
+                            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6.023 16L6 9H3V6h3V4c0-2.7 1.672-4 4.08-4 1.153 0 2.144.086 2.433.124v2.821h-1.67c-1.31 0-1.563.623-1.563 1.536V6H13l-1 3H9.28v7H6.023z" fill="#0270D7" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="screen-reader-text">Twitter</span>
+                            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 3c-.6.3-1.2.4-1.9.5.7-.4 1.2-1 1.4-1.8-.6.4-1.3.6-2.1.8-.6-.6-1.5-1-2.4-1-1.7 0-3.2 1.5-3.2 3.3 0 .3 0 .5.1.7-2.7-.1-5.2-1.4-6.8-3.4-.3.5-.4 1-.4 1.7 0 1.1.6 2.1 1.5 2.7-.5 0-1-.2-1.5-.4C.7 7.7 1.8 9 3.3 9.3c-.3.1-.6.1-.9.1-.2 0-.4 0-.6-.1.4 1.3 1.6 2.3 3.1 2.3-1.1.9-2.5 1.4-4.1 1.4H0c1.5.9 3.2 1.5 5 1.5 6 0 9.3-5 9.3-9.3v-.4C15 4.3 15.6 3.7 16 3z" fill="#0270D7" />
+                            </svg>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="screen-reader-text">Google</span>
+                            <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M7.9 7v2.4H12c-.2 1-1.2 3-4 3-2.4 0-4.3-2-4.3-4.4 0-2.4 2-4.4 4.3-4.4 1.4 0 2.3.6 2.8 1.1l1.9-1.8C11.5 1.7 9.9 1 8 1 4.1 1 1 4.1 1 8s3.1 7 7 7c4 0 6.7-2.8 6.7-6.8 0-.5 0-.8-.1-1.2H7.9z" fill="#0270D7" />
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+                <div class="footer-copyright">&copy; 2025 ScrapEase all rights reserved</div>
+          </div>
+        </footer>
+</div>
+
+    <script src="/static/main.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+            // Check database configuration
+            $.ajax({
+                url: '/check_db',
+                type: 'GET',
+                success: function(response) {
+                    if (response.status === 'error') {
+      $('#databaseWarning').show();
+    }
+                }
+            });
+            
+            // Toggle accordion
+            $('.accordion-header').on('click', function() {
+                $(this).toggleClass('active');
+                $(this).next('.accordion-content').slideToggle(300);
+    });
+    
+            // Enable scraping checkbox
+            $('#enableScraping').on('change', function() {
+      if ($(this).is(':checked')) {
+                    $('#fieldsContainer').slideDown();
+      } else {
+                    $('#fieldsContainer').slideUp();
+      }
+    });
+    
+            // Enable pagination checkbox
+            $('#enablePagination').on('change', function() {
+      if ($(this).is(':checked')) {
+                    $('#paginationContainer').slideDown();
+      } else {
+                    $('#paginationContainer').slideUp();
+      }
+    });
+    
+            // Add URLs function
+            $('#addUrlsBtn').on('click', function() {
+                const urlsText = $('#urlTextarea').val().trim();
+                if (!urlsText) return;
+                
+                // Split by spaces, tabs, new lines
+                const urls = urlsText.split(/[\s\n\t]+/).filter(url => url);
+                
+                urls.forEach(url => {
+                    if (url && isValidURL(url)) {
+                        addUrlBubble(url);
+                    } else {
+                        showError(`Invalid URL: ${url}`);
+                    }
+                });
+                
+                $('#urlTextarea').val('');
+            });
+            
+            // Clear URLs function
+            $('#clearUrlsBtn').on('click', function() {
+                $('#urlBubbleContainer').empty();
+      });
+    
+            // Add field button
+            $('#addFieldBtn').on('click', function() {
+      const field = $('#fieldInput').val().trim();
+      if (field) {
+                    addFieldTag(field);
+        $('#fieldInput').val('');
+      }
+    });
+    
+            // Launch button
+            $('#launchBtn').on('click', function() {
+                // Get URLs
+                const urls = [];
+                $('.url-bubble').each(function() {
+                    urls.push($(this).data('url'));
+    });
+    
+      if (urls.length === 0) {
+                    showError('Please add at least one URL');
         return;
       }
-      resultDiv.innerHTML = 'Scraping website...';
-      resultDiv.style.display = 'block';
-      try {
-        const response = await fetch('/scrape', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: `url=${encodeURIComponent(url)}&prompt=${encodeURIComponent(prompt)}`
-        });
-        const data = await response.json();
-        if (data.success) {
-          resultDiv.innerHTML = data.content;
-        } else {
-          resultDiv.innerHTML = `Error: ${data.error}`;
-        }
-      } catch (error) {
-        resultDiv.innerHTML = `Error: ${error.message}`;
+      
+                // Get fields if scraping enabled
+                const enableScraping = $('#enableScraping').is(':checked');
+                const fields = [];
+                if (enableScraping) {
+                    $('.field-tag').each(function() {
+                        fields.push($(this).data('field'));
+                    });
+                    
+                    if (fields.length === 0) {
+                        showError('Please add at least one field to extract');
+        return;
       }
-    }
-    async function parseContent() {
-      const parseDescription = document.getElementById('parseDescription').value;
-      const resultDiv = document.getElementById('parseResult');
+                }
+                
+                // Get pagination details if enabled
+                const enablePagination = $('#enablePagination').is(':checked');
+                const paginationDetails = enablePagination ? $('#paginationDetails').val() : '';
+                
+                // Set default model and tokens
+                const modelSelection = 'gemini/gemini-1.5-flash'; // Changed to gemini
+                const maxOutputTokens = 8192; // Increased token value for more data
+                
+                // Show loading state
+                const originalBtnText = $(this).html();
+                $(this).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+                $(this).prop('disabled', true);
       
-      if (!parseDescription) {
-          alert('Please enter a description of what to parse');
-          return;
-      }
-      
-      resultDiv.innerHTML = 'Parsing content...';
-      resultDiv.style.display = 'block';
-      
-      try {
-          const response = await fetch('/parse', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: `parse_description=${encodeURIComponent(parseDescription)}`
-          });
-          
-          const data = await response.json();
-          if (data.success) {
-              // Convert newlines to <br> tags and preserve whitespace
-              resultDiv.innerHTML = data.result.split('\n').map(line => 
-                  line.trim()).join('<br>');
-              // Add CSS to preserve formatting
-              resultDiv.style.whiteSpace = 'pre-wrap';
-              resultDiv.style.wordWrap = 'break-word';
+      // Prepare form data
+      const formData = new FormData();
+                urls.forEach(url => formData.append('urls[]', url));
+                fields.forEach(field => formData.append('fields[]', field));
+                formData.append('model_selection', modelSelection);
+                formData.append('use_pagination', enablePagination.toString());
+                formData.append('pagination_details', paginationDetails);
+                formData.append('max_output_tokens', maxOutputTokens);
+                
+                // Debug log the data being sent
+                console.log('Sending form data:', {
+                    urls: urls,
+                    fields: fields,
+                    model_selection: modelSelection,
+                    use_pagination: enablePagination,
+                    pagination_details: paginationDetails,
+                    max_output_tokens: maxOutputTokens
+                });
+                
+                // Submit the form
+      $.ajax({
+        url: '/scrape',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+                        console.log('Success response:', response);
+                        if (response && response.status === 'success') {
+            window.location.href = '/results';
           } else {
-              resultDiv.innerHTML = `Error: ${data.error}`;
+                            showError('Scraping completed but with issues');
+                            $('#launchBtn').html(originalBtnText);
+                            $('#launchBtn').prop('disabled', false);
           }
-      } catch (error) {
-          resultDiv.innerHTML = `Error: ${error.message}`;
-      }
-    }
-  </script>
+        },
+        error: function(xhr, status, error) {
+                        console.error('Error:', error, xhr.responseText);
+                        let errorMsg = 'An error occurred during scraping';
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            errorMsg = response.message || errorMsg;
+                        } catch (e) {}
+                        
+                        showError(errorMsg);
+                        $('#launchBtn').html(originalBtnText);
+                        $('#launchBtn').prop('disabled', false);
+        }
+      });
+    });
+            
+            // Helper function to add URL bubble
+            function addUrlBubble(url) {
+                // Check if URL already exists
+                let exists = false;
+                $('.url-bubble').each(function() {
+                    if ($(this).data('url') === url) {
+                        exists = true;
+                        return false;
+                    }
+                });
+                
+                if (exists) return;
+                
+                const bubble = $(`
+                    <div class="url-bubble" data-url="${url}">
+                        ${truncateString(url, 30)}
+                        <i class="fas fa-times delete-url"></i>
+                    </div>
+                `);
+                
+                $('#urlBubbleContainer').append(bubble);
+                
+                // Delete URL
+                bubble.find('.delete-url').on('click', function() {
+                    $(this).parent().remove();
+                });
+            }
+            
+            // Helper function to add field tag
+            function addFieldTag(field) {
+                // Check if field already exists
+                let exists = false;
+                $('.field-tag').each(function() {
+                    if ($(this).data('field') === field) {
+                        exists = true;
+                        return false;
+                    }
+                });
+                
+                if (exists) return;
+                
+                const tag = $(`
+                    <div class="field-tag" data-field="${field}">
+                        ${field}
+                        <i class="fas fa-times delete-field"></i>
+                    </div>
+                `);
+                
+                $('#fieldsTagContainer').append(tag);
+                
+                // Delete field
+                tag.find('.delete-field').on('click', function() {
+                    $(this).parent().remove();
+                });
+            }
+            
+            // Helper function to show error
+            function showError(message) {
+                $('#errorMessage').text(message);
+                $('#errorAlert').fadeIn();
+                setTimeout(() => {
+                    $('#errorAlert').fadeOut();
+                }, 5000);
+            }
+            
+            // Helper function to validate URL
+            function isValidURL(string) {
+                try {
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    return false;
+                }
+            }
+            
+            // Helper function to truncate string
+            function truncateString(str, num) {
+                if (str.length <= num) {
+                    return str;
+                }
+                return str.slice(0, num) + '...';
+            }
+
+            // Enter key for URL textarea
+            $('#urlTextarea').on('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    $('#addUrlsBtn').click();
+                }
+            });
+            
+            // Enter key for field input
+            $('#fieldInput').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $('#addFieldBtn').click();
+                }
+            });
+  });
+</script>
 </body>
 
 </html>
-
-
-
-
-<!-- Function Purpose:
-o This function handles the website scraping process
-o It's an async function, meaning it can handle asynchronous
-operations
-2. Input Handling:
-o Gets the URL from the input field
-using document.getElementById('url').value
-o Validates if URL is provided, if not shows an alert
-3. UI Feedback:
-o Gets reference to result div
-using document.getElementById('scrapeResult')
-o Shows "Scraping website..." loading message
-o Makes the result div visible
-4. API Communication:
-o Makes a POST request to '/scrape' endpoint
-o Sets proper headers for form data
-o Encodes URL properly using encodeURIComponent()
-5. Response Processing:
-o Awaits JSON response from server
-o On success: displays the scraped content
-o On error: displays error message
-o Catches and displays any network errors -->
-
-
-
-
-<!-- 1. Function Purpose:
-
-o Handles the content parsing after scraping
-o Also async to handle server communication
-
-2. Input Collection:
-
-o Gets parsing description from textarea
-o Validates if description is provided
-
-3. UI Feedback:
-
-o References parse result div
-o Shows "Parsing content..." loading message
-o Makes result div visible
-
-4. Server Communication:
-
-o Sends POST request to '/parse' endpoint
-o Includes proper headers for form data
-o Encodes description text properly
-
-5. Response Handling:
-
-o Processes JSON response from server
-o Success case: displays parsed result
-o Handles network errors gracefully -->
-
-

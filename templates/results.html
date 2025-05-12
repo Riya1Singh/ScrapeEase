@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ScrapEase - Results</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,600"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    />
+    <script src="https://unpkg.com/animejs@3.0.1/lib/anime.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
+    <style>
+      body {
+        font-family: "IBM Plex Sans", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #151719;
+        color: #9ba9b4;
+      }
+
+      /* Navbar styling */
+      .navbar {
+        display: flex;
+        justify-content: center;
+        background-color: transparent;
+        padding: 15px;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 1000;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .navbar a {
+        color: white;
+        text-decoration: none;
+        margin: 0 20px;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        padding: 10px 0;
+        transition: color 0.3s ease, transform 0.3s ease;
+      }
+
+      .navbar a::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background-color: #00bcd4;
+        transition: width 0.3s ease, left 0.3s ease;
+        transform: translateX(-50%);
+      }
+
+      .navbar a:hover {
+        color: #00bcd4;
+        transform: scale(1.1);
+      }
+
+      .navbar a:hover::before {
+        width: 100%;
+        left: 0;
+      }
+
+      /* Body wrap */
+      .body-wrap {
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      /* Main content */
+      .main-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 120px 20px 60px 20px;
+      }
+
+      /* Results header */
+      .results-header {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+
+      .results-header h1 {
+        color: #0270d7;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+      }
+
+      .results-header p {
+        color: #9ba9b4;
+        font-size: 1.2rem;
+      }
+
+      /* Stats cards */
+      .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 30px;
+        margin-bottom: 50px;
+      }
+
+      .stats-card {
+        background-color: #202b36;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .stats-icon {
+        font-size: 32px;
+        margin-bottom: 15px;
+        color: #0270d7;
+      }
+
+      .stats-title {
+        color: #fff;
+        font-size: 18px;
+        margin-bottom: 15px;
+      }
+
+      .stats-value {
+        font-size: 24px;
+        font-weight: 600;
+        color: #0270d7;
+      }
+
+      /* Action buttons */
+      .actions-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 50px;
+      }
+
+      .button {
+        padding: 12px 25px;
+        background-color: #0270d7;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .button:hover {
+        background-color: #0f8afd;
+        transform: translateY(-2px);
+      }
+
+      .button i {
+        margin-right: 8px;
+      }
+
+      .button-secondary {
+        background-color: transparent;
+        border: 2px solid #0270d7;
+        color: #0270d7;
+      }
+
+      .button-secondary:hover {
+        background-color: rgba(2, 112, 215, 0.1);
+      }
+
+      .button-danger {
+        background-color: #e5363a;
+      }
+
+      .button-danger:hover {
+        background-color: #f05356;
+      }
+
+      /* Data tables */
+      .data-container {
+        background-color: #202b36;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        margin-bottom: 50px;
+      }
+
+      .data-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .data-header h2 {
+        color: #fff;
+        font-size: 1.8rem;
+        margin: 0;
+      }
+
+      .data-header .search-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .search-input {
+        padding: 10px 15px;
+        border-radius: 5px;
+        background-color: #2e3237;
+        border: 2px solid #3e454f;
+        color: #fff;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+        width: 200px;
+      }
+
+      .search-input:focus {
+        border-color: #0270d7;
+        outline: none;
+      }
+
+      /* Table styling */
+      .table-container {
+        overflow-x: auto;
+        margin-bottom: 30px;
+      }
+
+      .page-url {
+        padding: 5px 0;
+        word-break: break-all;
+        color: #0270d7;
+      }
+
+      .page-url + hr {
+        border: none;
+        border-top: 1px solid #2e3237;
+        margin: 5px 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #9ba9b4;
+      }
+
+      th {
+        background-color: #2e3237;
+        padding: 15px;
+        text-align: left;
+        color: #fff;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+      }
+
+      td {
+        padding: 15px;
+        border-bottom: 1px solid #2e3237;
+        max-width: 300px;
+        word-wrap: break-word;
+        white-space: normal;
+        font-size: 14px;
+      }
+
+      tr:hover {
+        background-color: rgba(2, 112, 215, 0.05);
+      }
+
+      .page-url {
+        word-break: break-all;
+        font-family: monospace;
+        padding: 8px;
+        background: rgba(2, 112, 215, 0.1);
+        border-radius: 4px;
+        margin: 4px 0;
+      }
+
+      .copy-url-btn {
+        padding: 6px 12px;
+        margin: 0;
+      }
+
+      .copy-url-btn:hover {
+        transform: scale(1.1);
+      }
+
+      /* Download buttons */
+      .download-container {
+        margin-top: 30px;
+      }
+
+      .download-title {
+        font-size: 18px;
+        color: #fff;
+        margin-bottom: 15px;
+      }
+
+      .download-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      /* Copy notification */
+      .copy-notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #0270d7;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 5px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        display: none;
+        animation: fadeInOut 2s ease;
+      }
+
+      @keyframes fadeInOut {
+        0% {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        10% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        90% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+      }
+
+      /* Back to top button */
+      .back-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #0270d7;
+        color: white;
+        text-align: center;
+        line-height: 40px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        display: none;
+        cursor: pointer;
+        z-index: 1000;
+        transition: background-color 0.3s ease;
+      }
+
+      .back-to-top:hover {
+        background-color: #0f8afd;
+      }
+
+      /* Footer styling */
+      .site-footer {
+        background: #202b36;
+        padding: 40px 0;
+        margin-top: auto;
+      }
+
+      .site-footer-inner {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .footer-brand {
+        margin-bottom: 24px;
+      }
+
+      .footer-links {
+        display: flex;
+        margin-bottom: 24px;
+        list-style: none;
+        padding: 0;
+      }
+
+      .footer-links li {
+        margin-right: 24px;
+      }
+
+      .footer-links a {
+        color: #9ba9b4;
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+
+      .footer-links a:hover {
+        color: #fff;
+      }
+
+      .footer-social-links {
+        display: flex;
+        margin-bottom: 24px;
+        list-style: none;
+        padding: 0;
+      }
+
+      .footer-social-links li {
+        margin-right: 16px;
+      }
+
+      .footer-social-links a {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #323d48;
+        transition: background 0.15s ease;
+        text-decoration: none;
+      }
+
+      .footer-social-links a:hover {
+        background: #0270d7;
+      }
+
+      .footer-copyright {
+        color: #9ba9b4;
+        font-size: 14px;
+        line-height: 22px;
+      }
+
+      /* Responsive styles */
+      @media (max-width: 768px) {
+        .stats-container {
+          grid-template-columns: 1fr;
+        }
+
+        .data-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .actions-container {
+          flex-direction: column;
+        }
+
+        .button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="is-boxed has-animations">
+    <div class="body-wrap">
+      <!-- Navigation -->
+      <div class="navbar">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/contact" class="nav-link">Contact</a>
+        <a href="/main" class="nav-link">Scraper</a>
+        <a href="/login" class="nav-link">Login</a>
+      </div>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <div class="results-header">
+          <h1>Scraping Results</h1>
+          <p>Data extracted from your provided URLs</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="actions-container">
+          <a href="/main" class="button button-secondary">
+            <i class="fas fa-arrow-left"></i>New Scraping Job
+          </a>
+          <button id="clearResultsBtn" class="button button-danger">
+            <i class="fas fa-trash"></i>Clear Results
+          </button>
+        </div>
+
+        <!-- Scraping Results -->
+        {% if results.data %}
+        <div class="data-container">
+          <div class="data-header">
+            <h2><i class="fas fa-table"></i> Extracted Data</h2>
+            <div class="search-container">
+              <div>
+                <input
+                  type="text"
+                  class="search-input"
+                  id="tableSearch"
+                  placeholder="Search data..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Data Table -->
+          <div class="table-container">
+            <table id="resultsTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                    {% set header_keys = results.data[0].parsed_data.listings[0].keys() %}
+                    {% for key in header_keys %}
+                        <th>{{ key }}</th>
+                    {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for parsed_data in results.data %}
+                {% for item in parsed_data.parsed_data.listings %}
+                <tr>
+                  <td>{{ loop.index }}</td>
+                    {% for key in header_keys %}
+                        <td>{{ item[key] }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                {% endfor %}
+                {% if results.data[0].parsed_data.listings|length > 0 %}
+                  <tr>
+                    <td colspan="{{ header_keys|length + 1 }}">
+                      <strong>Total Listings: {{ results.data[0].parsed_data.listings|length }}</strong>
+                    </td>
+                  </tr>
+                {% endif %}
+                {% if results.data[0].parsed_data.listings|length == 0 %}
+                  <tr>
+                    <td colspan="{{ header_keys|length + 1 }}">No data available</td>
+                  </tr>
+                {% endif %}
+                {% if results.data[0].parsed_data.listings|length == 0 %}
+                  <tr>
+                    <td colspan="{{ header_keys|length + 1 }}">No data available</td>
+                  </tr>
+                {% endif %}
+                {% if results.data[0].parsed_data.listings|length > 0 %}
+                  <tr>
+                    <td colspan="{{ header_keys|length + 1 }}">
+                      <strong>Total Listings: {{ results.data[0].parsed_data.listings|length }}</strong>
+                    </td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Download Options -->
+          <div class="download-container">
+            <h3 class="download-title">Download Data</h3>
+            <div class="download-actions">
+              <button id="downloadJsonBtn" class="button">
+                <i class="fas fa-file-code"></i>Download JSON
+              </button>
+              <button id="downloadCsvBtn" class="button">
+                <i class="fas fa-file-csv"></i>Download CSV
+              </button>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Pagination Results -->
+        {% if results.pagination_info %}
+        <div class="data-container">
+          <div class="data-header">
+            <h2><i class="fas fa-link"></i> Pagination URLs</h2>
+          </div>
+
+          <div class="table-container">
+            <table id="paginationTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Page URL</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if results.pagination_info %}
+                  {% for url in results.pagination_info[0].pagination_data.page_urls %}
+                  <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>
+                      <div class="page-url">{{ url }}</div>
+                    </td>
+                    <td>
+                      <button class="button button-secondary copy-url-btn" data-url="{{ url }}">
+                        <i class="fas fa-copy"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="3">No pagination URLs available</td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Download Options -->
+          <div class="download-container">
+            <h3 class="download-title">Download Pagination URLs</h3>
+            <div class="download-actions">
+              <button id="downloadPaginationJson" class="button">
+                <i class="fas fa-file-code"></i>Download JSON
+              </button>
+              <button id="downloadPaginationCsv" class="button">
+                <i class="fas fa-file-csv"></i>Download CSV
+              </button>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Back to top button -->
+        <div class="back-to-top">
+          <i class="fas fa-arrow-up"></i>
+        </div>
+
+        <!-- Copy notification -->
+        <div class="copy-notification">URL copied to clipboard!</div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="site-footer">
+        <div class="site-footer-inner">
+          <div class="brand footer-brand">
+            <a href="/">
+              <img
+                class="header-logo-image"
+                src="/static/images/logo.svg"
+                alt="Logo"
+              />
+            </a>
+          </div>
+          <ul class="footer-links list-reset">
+            <li>
+              <a href="/contact">Contact</a>
+            </li>
+            <li>
+              <a href="/about">About us</a>
+            </li>
+            <li>
+              <a href="/">FAQ's</a>
+            </li>
+            <li>
+              <a href="/">Support</a>
+            </li>
+          </ul>
+          <ul class="footer-social-links list-reset">
+            <li>
+              <a href="#">
+                <span class="screen-reader-text">Facebook</span>
+                <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M6.023 16L6 9H3V6h3V4c0-2.7 1.672-4 4.08-4 1.153 0 2.144.086 2.433.124v2.821h-1.67c-1.31 0-1.563.623-1.563 1.536V6H13l-1 3H9.28v7H6.023z"
+                    fill="#0270D7"
+                  />
+                </svg>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <span class="screen-reader-text">Twitter</span>
+                <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M16 3c-.6.3-1.2.4-1.9.5.7-.4 1.2-1 1.4-1.8-.6.4-1.3.6-2.1.8-.6-.6-1.5-1-2.4-1-1.7 0-3.2 1.5-3.2 3.3 0 .3 0 .5.1.7-2.7-.1-5.2-1.4-6.8-3.4-.3.5-.4 1-.4 1.7 0 1.1.6 2.1 1.5 2.7-.5 0-1-.2-1.5-.4C.7 7.7 1.8 9 3.3 9.3c-.3.1-.6.1-.9.1-.2 0-.4 0-.6-.1.4 1.3 1.6 2.3 3.1 2.3-1.1.9-2.5 1.4-4.1 1.4H0c1.5.9 3.2 1.5 5 1.5 6 0 9.3-5 9.3-9.3v-.4C15 4.3 15.6 3.7 16 3z"
+                    fill="#0270D7"
+                  />
+                </svg>
+              </a>
+            </li>
+            <li>
+              <a href="#">
+                <span class="screen-reader-text">Google</span>
+                <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M7.9 7v2.4H12c-.2 1-1.2 3-4 3-2.4 0-4.3-2-4.3-4.4 0-2.4 2-4.4 4.3-4.4 1.4 0 2.3.6 2.8 1.1l1.9-1.8C11.5 1.7 9.9 1 8 1 4.1 1 1 4.1 1 8s3.1 7 7 7c4 0 6.7-2.8 6.7-6.8 0-.5 0-.8-.1-1.2H7.9z"
+                    fill="#0270D7"
+                  />
+                </svg>
+              </a>
+            </li>
+          </ul>
+          <div class="footer-copyright">
+            &copy; 2025 ScrapEase all rights reserved
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script src="/static/main.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Search functionality
+        $("#tableSearch").on("keyup", function () {
+          var value = $(this).val().toLowerCase();
+          $("#resultsTable tbody tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+          });
+        });
+
+        // Search functionality setup
+
+        // Download buttons
+        $("#downloadJsonBtn").on("click", function () {
+          window.location.href = "/download_json";
+        });
+
+        $("#downloadCsvBtn").on("click", function () {
+          window.location.href = "/download_csv";
+        });
+
+        $("#downloadPaginationJson").on("click", function () {
+          window.location.href = "/download_pagination_json";
+        });
+
+        $("#downloadPaginationCsv").on("click", function () {
+          window.location.href = "/download_pagination_csv";
+        });
+
+        // Copy URL functionality
+        $(".copy-url-btn").on("click", function () {
+          var url = $(this).data("url");
+          navigator.clipboard.writeText(url).then(function () {
+            $(".copy-notification").fadeIn().delay(2000).fadeOut();
+          });
+        });
+
+        // Clear results
+        $("#clearResultsBtn").on("click", function () {
+          $.ajax({
+            url: "/clear_results",
+            type: "POST",
+            success: function () {
+              window.location.href = "/";
+            },
+          });
+        });
+
+        // Back to top button
+        $(window).scroll(function () {
+          if ($(this).scrollTop() > 300) {
+            $(".back-to-top").fadeIn();
+          } else {
+            $(".back-to-top").fadeOut();
+          }
+        });
+
+        $(".back-to-top").on("click", function () {
+          $("html, body").animate({ scrollTop: 0 }, 800);
+          return false;
+        });
+
+        // Initialize ScrollReveal for animations
+        if (window.ScrollReveal) {
+          const sr = ScrollReveal();
+
+          sr.reveal(".stats-card", {
+            duration: 600,
+            distance: "20px",
+            easing: "cubic-bezier(0.5, -0.01, 0, 1.005)",
+            origin: "bottom",
+            interval: 100,
+          });
+
+          sr.reveal(".data-container", {
+            duration: 600,
+            distance: "30px",
+            easing: "cubic-bezier(0.5, -0.01, 0, 1.005)",
+            origin: "bottom",
+            interval: 200,
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
