@@ -57,8 +57,6 @@ def parse_with_ollama(dom_chunks, parse_description):
     return "\n".join(parsed_results)
 
 
-
-
 #Creates a chat prompt from the template
 #Creates a processing chain that connects prompt to model
 #The | operator creates a pipeline of operations
