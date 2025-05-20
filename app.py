@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file
 import json
+import sqlite3
 import os
 import sys
 import asyncio
@@ -105,6 +106,45 @@ def reset_password(token):
         return redirect(url_for('login'))
 
     return render_template('reset_password.html')
+
+
+#feedback form route
+@app.route('/feedback')
+def feedback_form():
+    return render_template('feedback.html')
+
+@app.route('/submit_feedback', methods=['POST'])
+def submit_feedback():
+    username = request.form.get('username')
+    reviews = request.form.get('review')
+    fun_meter = request.form.get('fun_meter')
+
+    # Connect to database
+    conn = sqlite3.connect('instance/ScrapeEase.db')
+    cursor = conn.cursor()
+
+    # Ensure table exists
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            review TEXT,
+            fun_meter INTEGER
+        )
+    ''')
+
+    # Insert the feedback
+    cursor.execute("INSERT INTO feedback (username, review, fun_meter) VALUES (?, ?, ?)", 
+                   (username, reviews, fun_meter))
+
+    conn.commit()
+    conn.close()
+
+    return redirect('/thank_you')
+
+@app.route('/thank_you')
+def thank_you():
+    return render_template('thank_you.html')
 
 
 
