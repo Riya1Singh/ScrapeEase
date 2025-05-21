@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file, flash
+from flask_login import current_user, login_required
 import json
 import sqlite3
 import os
@@ -14,7 +15,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required
 import warnings
 warnings.filterwarnings("ignore",module="streamlit")
-from flask_mail import Mail
+from flask_mail import Mail, Message
 
 
 
@@ -157,17 +158,6 @@ def about():
 def contact():
     return render_template('contact.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        return "login submitted!"
-    return render_template('login.html')
-        
-       
-
-
 # Make sure the database is initialized
 db_initialized = False
 
@@ -199,6 +189,7 @@ def utility_processor():
     return dict(now=now, models=MODELS_USED)
 
 @app.route('/main', methods=['GET'])
+@login_required
 def main():
     global db_initialized
     
@@ -213,6 +204,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/scrape', methods=['POST'])
+@login_required
 def scrape():
     # Get form data
     urls = request.form.getlist('urls[]')
@@ -352,6 +344,7 @@ def scrape():
         return jsonify({'status': 'error', 'message': f'An error occurred during scraping: {str(e)}'})
 
 @app.route('/results', methods=['GET'])
+@login_required
 def results():
     # Get results from session
     results = session.get('results', None)
@@ -362,6 +355,7 @@ def results():
     return render_template('results.html', results=results)
 
 @app.route('/download_json', methods=['GET'])
+@login_required
 def download_json():
     results = session.get('results', None)
     
@@ -393,6 +387,7 @@ def download_json():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/download_csv', methods=['GET'])
+@login_required
 def download_csv():
     results = session.get('results', None)
     

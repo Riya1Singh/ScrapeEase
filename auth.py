@@ -34,9 +34,9 @@ def login():
 
         user = User.query.filter_by(username=username).first() or User.query.filter_by(email=username).first()
 
-        if user and hashpw(password.encode('utf-8'), user.password.encode('utf-8')) == user.password.encode('utf-8'):
+        if user and hashpw(password.encode('utf-8'), user.password.encode('utf-8')) == user.password.encode('utf-8'):            
             login_user(user)
-            return redirect(url_for('index'))  # Redirect to your home page
+            return redirect(url_for('home'))  # Redirect to your home page
 
         flash('Invalid username or password')
         return redirect(url_for('auth.login'))
