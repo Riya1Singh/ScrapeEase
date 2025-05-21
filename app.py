@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, send_file
 import json
+import sqlite3
 import os
 import sys
 import asyncio
@@ -13,6 +14,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required
 import warnings
 warnings.filterwarnings("ignore",module="streamlit")
+from flask_mail import Mail
 
 
 
@@ -38,6 +40,114 @@ db.init_app(app)  # Initialize SQLAlchemy
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'auth.login' 
+
+
+# Initialize Flask-Mail
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'your_email@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your_app_password'  # Use App Password for Gmail
+mail = Mail(app)
+
+
+
+#Generate a password reset token
+
+from itsdangerous import URLSafeTimedSerializer
+
+serializer = URLSafeTimedSerializer(app.secret_key)
+
+def generate_reset_token(email):
+    return serializer.dumps(email, salt='password-reset-salt')
+
+def confirm_token(token, expiration=3600):
+    try:
+        email = serializer.loads(token, salt='password-reset-salt', max_age=expiration)
+    except Exception:
+        return None
+    return email
+
+
+
+#route to request password reset
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            token = generate_reset_token(email)
+            reset_url = url_for('reset_password', token=token, _external=True)
+            msg = Message('Password Reset Request', sender='your_email@gmail.com', recipients=[email])
+            msg.body = f'Click the link to reset your password: {reset_url}'
+            mail.send(msg)
+            flash('Password reset link sent to your email.', 'info')
+        else:
+            flash('Email not found.', 'danger')
+    return render_template('forgot_password.html')
+
+
+#route to handle reset link and update password
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    email = confirm_token(token)
+    if not email:
+        flash('Invalid or expired token', 'danger')
+        return redirect(url_for('forgot_password'))
+
+    if request.method == 'POST':
+        new_password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        user.set_password(new_password)  # You should hash the password here
+        db.session.commit()
+        flash('Password updated successfully', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html')
+
+
+#feedback form route
+@app.route('/feedback')
+def feedback_form():
+    return render_template('feedback.html')
+
+@app.route('/submit_feedback', methods=['POST'])
+def submit_feedback():
+    username = request.form.get('username')
+    reviews = request.form.get('review')
+    fun_meter = request.form.get('fun_meter')
+
+    # Connect to database
+    conn = sqlite3.connect('instance/ScrapeEase.db')
+    cursor = conn.cursor()
+
+    # Ensure table exists
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            review TEXT,
+            fun_meter INTEGER
+        )
+    ''')
+
+    # Insert the feedback
+    cursor.execute("INSERT INTO feedback (username, review, fun_meter) VALUES (?, ?, ?)", 
+                   (username, reviews, fun_meter))
+
+    conn.commit()
+    conn.close()
+
+    return redirect('/thank_you')
+
+@app.route('/thank_you')
+def thank_you():
+    return render_template('thank_you.html')
+
+
+
 
 @app.route('/about')
 def about():
