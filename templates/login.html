@@ -315,14 +315,13 @@
                         <div class="form-group">
                             <label for="login-password">Password</label>
                             <input type="password" id="login-password" name="password" class="form-control" required>
-                        </div>
-                        <div class="remember-me">
+                        </div>                        <div class="remember-me">
                             <input type="checkbox" id="remember" name="remember">
                             <label for="remember">Remember me</label>
                         </div>
                         <button type="submit" class="button">Login</button>
                         <div style="text-align: center; margin-top: 20px;">
-                            <a href="#" class="forgot-password">Forgot Password?</a>
+                            <a href="{{ url_for('forgot_password') }}" class="forgot-password">Forgot Password?</a>
                         </div>
                     </form>
                     

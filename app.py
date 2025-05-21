@@ -48,8 +48,16 @@ login_manager.login_view = 'auth.login'
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
+<<<<<<< HEAD
 app.config['MAIL_USERNAME'] = 'scrapeease@gmail.com'
 app.config['MAIL_PASSWORD'] = 'epoa qajq dyeu dadi'  # Use App Password for Gmail
+=======
+app.config['MAIL_USERNAME'] = 'scrapeease@gmail.com'  # Replace with your actual Gmail
+app.config['MAIL_PASSWORD'] = 'jnku gdge fjak pipz'  # Replace with your actual App Password
+app.config.update(
+    MAIL_DEFAULT_SENDER='scrapeease@gmail.com'
+)
+>>>>>>> a735594a6849addef7ce6aeaa8d8c231daee0ac0
 mail = Mail(app)
 
 
@@ -76,35 +84,70 @@ def confirm_token(token, expiration=3600):
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        email = request.form['email']
-        user = User.query.filter_by(email=email).first()
-        if user:
-            token = generate_reset_token(email)
-            reset_url = url_for('reset_password', token=token, _external=True)
-            msg = Message('Password Reset Request', sender='your_email@gmail.com', recipients=[email])
-            msg.body = f'Click the link to reset your password: {reset_url}'
-            mail.send(msg)
-            flash('Password reset link sent to your email.', 'info')
-        else:
-            flash('Email not found.', 'danger')
+        try:
+            email = request.form['email']
+            user = User.query.filter_by(email=email).first()
+            if user:
+                token = generate_reset_token(email)
+                reset_url = url_for('reset_password', token=token, _external=True)
+                msg = Message(
+                    'Password Reset Request - ScrapeEase',
+                    recipients=[email],
+                    html=render_template(
+                        'email/reset_password.html',
+                        reset_url=reset_url,
+                        username=user.username
+                    )
+                )
+                mail.send(msg)
+                flash('Password reset link has been sent to your email.', 'success')
+                return redirect(url_for('auth.login'))
+            else:
+                flash('No user found with that email address.', 'error')
+        except Exception as e:
+            flash('An error occurred. Please try again later.', 'error')
+            print(f"Password reset error: {str(e)}")  # For debugging
     return render_template('forgot_password.html')
 
 
 #route to handle reset link and update password
 @app.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
-    email = confirm_token(token)
-    if not email:
-        flash('Invalid or expired token', 'danger')
-        return redirect(url_for('forgot_password'))
+    try:
+        email = confirm_token(token)
+        if not email:
+            flash('The password reset link is invalid or has expired.', 'error')
+            return redirect(url_for('forgot_password'))
 
-    if request.method == 'POST':
-        new_password = request.form['password']
-        user = User.query.filter_by(email=email).first()
-        user.set_password(new_password)  # You should hash the password here
-        db.session.commit()
-        flash('Password updated successfully', 'success')
-        return redirect(url_for('login'))
+        if request.method == 'POST':
+            password = request.form['password']
+            confirm_password = request.form['confirm_password']
+            
+            if password != confirm_password:
+                flash('Passwords do not match.', 'error')
+                return render_template('reset_password.html')
+            
+            if len(password) < 6:
+                flash('Password must be at least 6 characters long.', 'error')
+                return render_template('reset_password.html')
+
+            user = User.query.filter_by(email=email).first()
+            if user:
+                from bcrypt import hashpw, gensalt
+                hashed_password = hashpw(password.encode('utf-8'), gensalt())
+                user.password = hashed_password.decode('utf-8')
+                db.session.commit()
+                flash('Your password has been updated successfully.', 'success')
+                return redirect(url_for('auth.login'))
+            else:
+                flash('User not found.', 'error')
+                return redirect(url_for('forgot_password'))
+                
+        return render_template('reset_password.html')
+    except Exception as e:
+        flash('An error occurred. Please try again.', 'error')
+        print(f"Password reset error: {str(e)}")  # For debugging
+        return redirect(url_for('forgot_password'))
 
     return render_template('reset_password.html')
 
