@@ -54,11 +54,16 @@ login_manager.login_view = 'auth.login'
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
+<<<<<<< HEAD
+app.config['MAIL_USERNAME'] = 'scrapeease@gmail.com'
+app.config['MAIL_PASSWORD'] = 'epoa qajq dyeu dadi'  # Use App Password for Gmail
+=======
 app.config['MAIL_USERNAME'] = 'scrapeease@gmail.com'  # Replace with your actual Gmail
 app.config['MAIL_PASSWORD'] = 'mrwj plky qerm dkey'  # Replace with your actual App Password
 app.config.update(
     MAIL_DEFAULT_SENDER=os.environ.get('MAIL_USERNAME', 'scrapeease@gmail.com')
 )
+>>>>>>> a735594a6849addef7ce6aeaa8d8c231daee0ac0
 mail = Mail(app)
 
 
