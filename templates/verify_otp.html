@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Verify OTP | ScrapeEase</title>
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,600" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/animejs@3.0.1/lib/anime.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
+    <style>
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #151719;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background-color: transparent;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 20px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            padding: 10px 0;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .auth-container {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .auth-content {
+            display: flex;
+            width: 100%;
+            background: #1d2026;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            margin: 20px;
+        }
+        
+        .auth-left {
+            flex: 1;
+            padding: 60px;
+            color: #fff;
+            background: linear-gradient(45deg, #0270D7, #0F8AFD);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-right {
+            flex: 1;
+            padding: 60px;
+            background: #1d2026;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid #444;
+            background: #2b2b3d;
+            color: #f1f1f1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5rem;
+            text-align: center;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3fa9f5;
+            box-shadow: 0 0 0 3px rgba(63, 169, 245, 0.2);
+        }
+
+        .button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: #0270D7;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            background-color: #3fa9f5;
+        }
+
+        .button:hover {
+            background-color: #3290d6;
+            transform: translateY(-2px);
+        }
+
+        .flash {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .success {
+            background-color: rgba(220, 252, 231, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+        
+        .error {
+            background-color: rgba(254, 226, 226, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .info {
+            background-color: rgba(219, 234, 254, 0.1);
+            color: #60a5fa;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .resend-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #9BA9B4;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .resend-link:hover {
+            color: #3fa9f5;
+        }
+
+        .logo {
+            width: 80px;
+            margin-bottom: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        .otp-timer {
+            color: #9BA9B4;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="is-boxed has-animations">
+    <div class="navbar">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/contact" class="nav-link">Contact</a>
+        <a href="{{ url_for('auth.login') }}" class="nav-link">Login</a>
+        <a href="/feedback" class="nav-link">Feedback</a>
+    </div>
+
+    <div class="auth-container">
+        <div class="auth-content">
+            <div class="auth-left">
+                <h1>Verify OTP</h1>
+                <p>We've sent a one-time password (OTP) to your email address. Please enter it below to continue with password reset.</p>
+                <p>The OTP will expire in 10 minutes. If you haven't received the email, please check your spam folder.</p>
+            </div>
+            <div class="auth-right">
+                <div style="text-align: center;">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="ScrapeEase Logo" class="logo" />
+                    <h2 style="color: #fff; margin-bottom: 24px;">Enter OTP</h2>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('verify_otp') }}">
+                    <div class="form-group">
+                        <label for="otp">Enter the 6-digit OTP</label>
+                        <input type="text" id="otp" name="otp" class="form-control" 
+                               maxlength="6" minlength="6" pattern="\d{6}"
+                               placeholder="000000" required autocomplete="one-time-code">
+                    </div>
+                    <button type="submit" class="button">Verify OTP</button>
+                </form>
+
+                <div style="text-align: center;">
+                    <div class="otp-timer" id="otpTimer">OTP expires in: 10:00</div>
+                    <a href="{{ url_for('forgot_password') }}" class="resend-link">
+                        Resend OTP
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // OTP Timer
+        function startOTPTimer(duration) {
+            let timer = duration;
+            const timerDisplay = document.getElementById('otpTimer');
+            const interval = setInterval(function() {
+                const minutes = Math.floor(timer / 60);
+                const seconds = timer % 60;
+
+                timerDisplay.textContent = `OTP expires in: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    timerDisplay.textContent = 'OTP has expired';
+                }
+            }, 1000);
+        }
+
+        // Start 10-minute timer
+        startOTPTimer(10 * 60);
+
+        // Auto-format OTP input
+        document.getElementById('otp').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+        });
+    </script>
+</body>
+</html>
