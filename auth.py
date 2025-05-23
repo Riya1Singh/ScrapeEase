@@ -5,41 +5,56 @@ from bcrypt import hashpw, gensalt
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        username = request.form.get('username')
-        password = request.form.get('password')
-
-        if User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first():
-            flash('Username already exists')
-            return redirect(url_for('auth.register'))
-
-        hashed_password = hashpw(password.encode('utf-8'), gensalt())
-        new_user = User(username=username, password=hashed_password.decode('utf-8'), email=email)
-
-        db.session.add(new_user)
-        db.session.commit()
-
-        return redirect(url_for('auth.login'))
-
-    return render_template('register.html')
-
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        # Check if the form is for registration
+        if 'email' in request.form:
+            # Register form handling
+            email = request.form.get('email')
+            username = request.form.get('username')
+            password = request.form.get('password')
+            agree = request.form.get('agree')
 
-        user = User.query.filter_by(username=username).first() or User.query.filter_by(email=username).first()
+            if not agree:
+                flash('You must agree to the Terms and Conditions')
+                return redirect(url_for('auth.login'))
 
-        if user and hashpw(password.encode('utf-8'), user.password.encode('utf-8')) == user.password.encode('utf-8'):            
-            login_user(user)
-            return redirect(url_for('home'))  # Redirect to your home page
+            if User.query.filter_by(username=username).first():
+                flash('Username already exists')
+                return redirect(url_for('auth.login'))
+            
+            if User.query.filter_by(email=email).first():
+                flash('Email already registered')
+                return redirect(url_for('auth.login'))
 
-        flash('Invalid username or password')
-        return redirect(url_for('auth.login'))
+            hashed_password = hashpw(password.encode('utf-8'), gensalt())
+            new_user = User(
+                username=username, 
+                password=hashed_password.decode('utf-8'), 
+                email=email
+            )
+
+            db.session.add(new_user)
+            db.session.commit()
+
+            flash('Registration successful! Please login')
+            return redirect(url_for('auth.login'))
+        
+        else:
+            # Login form handling
+            username = request.form.get('username')
+            password = request.form.get('password')
+            remember = True if request.form.get('remember') else False
+
+            user = User.query.filter_by(username=username).first() or User.query.filter_by(email=username).first()
+
+            if user and hashpw(password.encode('utf-8'), user.password.encode('utf-8')) == user.password.encode('utf-8'):            
+                login_user(user, remember=remember)
+                return redirect(url_for('home'))  # Redirect to your home page
+
+            flash('Invalid username or password')
+            return redirect(url_for('auth.login'))
 
     return render_template('login.html')
 

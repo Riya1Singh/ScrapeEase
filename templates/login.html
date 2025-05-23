@@ -288,7 +288,6 @@
         <a href="/contact" class="nav-link">Contact</a>
         <a href="/main" class="nav-link">Scraper</a>
         <a href="/login" class="nav-link">Login</a>
-        <a href="{{ url_for('forgot_password') }}">Forgot Password?</a>
     </div>
 
     <div class="auth-container">
@@ -307,7 +306,7 @@
                 
                 <div class="form-container">
                     <!-- Login Form -->
-                    <form action="/login" method="POST" class="login-form form-active">
+                    <form action="" method="POST" class="login-form form-active">
                         <div class="form-group">
                             <label for="login-username">Username</label>
                             <input type="text" id="login-username" name="username" class="form-control" required>
@@ -326,7 +325,7 @@
                     </form>
                     
                     <!-- Register Form -->
-                    <form action="/register" method="POST" class="register-form">
+                    <form action="" method="POST" class="register-form">
                         <div class="form-group">
                             <label for="register-username">Username</label>
                             <input type="text" id="register-username" name="username" class="form-control" required>
