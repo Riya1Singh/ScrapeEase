@@ -16,6 +16,8 @@ from flask_login import LoginManager, login_required
 import warnings
 warnings.filterwarnings("ignore",module="streamlit")
 from flask_mail import Mail, Message
+import random
+import string
 
 
 
@@ -44,14 +46,18 @@ login_manager.login_view = 'auth.login'
 
 
 # Initialize Flask-Mail
+# To set up email:
+# 1. Enable 2-Step Verification in your Google Account
+# 2. Generate an App Password at: https://myaccount.google.com/apppasswords
+# 3. Use that 16-character App Password here
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'scrapeease@gmail.com'  # Replace with your actual Gmail
-app.config['MAIL_PASSWORD'] = 'jnku gdge fjak pipz'  # Replace with your actual App Password
+app.config['MAIL_PASSWORD'] = 'mrwj plky qerm dkey'  # Replace with your actual App Password
 app.config.update(
-    MAIL_DEFAULT_SENDER='scrapeease@gmail.com'
+    MAIL_DEFAULT_SENDER=os.environ.get('MAIL_USERNAME', 'scrapeease@gmail.com')
 )
 mail = Mail(app)
 
@@ -83,20 +89,22 @@ def forgot_password():
             email = request.form['email']
             user = User.query.filter_by(email=email).first()
             if user:
-                token = generate_reset_token(email)
-                reset_url = url_for('reset_password', token=token, _external=True)
+                otp = generate_otp()
+                store_otp(email, otp)
+                
                 msg = Message(
-                    'Password Reset Request - ScrapeEase',
+                    'Password Reset OTP - ScrapeEase',
                     recipients=[email],
                     html=render_template(
-                        'email/reset_password.html',
-                        reset_url=reset_url,
+                        'email/reset_otp.html',
+                        otp=otp,
                         username=user.username
                     )
                 )
                 mail.send(msg)
-                flash('Password reset link has been sent to your email.', 'success')
-                return redirect(url_for('auth.login'))
+                session['reset_email'] = email  # Store email for the next step
+                flash('OTP has been sent to your email.', 'success')
+                return redirect(url_for('verify_otp'))
             else:
                 flash('No user found with that email address.', 'error')
         except Exception as e:
@@ -105,16 +113,16 @@ def forgot_password():
     return render_template('forgot_password.html')
 
 
-#route to handle reset link and update password
-@app.route('/reset-password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    try:
-        email = confirm_token(token)
-        if not email:
-            flash('The password reset link is invalid or has expired.', 'error')
-            return redirect(url_for('forgot_password'))
+#route to reset password after OTP verification
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    if 'reset_email' not in session or 'otp_verified' not in session:
+        flash('Please verify your OTP first.', 'error')
+        return redirect(url_for('forgot_password'))
 
+    try:
         if request.method == 'POST':
+            email = session['reset_email']
             password = request.form['password']
             confirm_password = request.form['confirm_password']
             
@@ -132,13 +140,17 @@ def reset_password(token):
                 hashed_password = hashpw(password.encode('utf-8'), gensalt())
                 user.password = hashed_password.decode('utf-8')
                 db.session.commit()
+                
+                # Clean up all session data related to password reset
+                session.pop('reset_email', None)
+                session.pop('otp_verified', None)
+                session.pop('otp_attempts', None)
+                
                 flash('Your password has been updated successfully.', 'success')
                 return redirect(url_for('auth.login'))
             else:
                 flash('User not found.', 'error')
                 return redirect(url_for('forgot_password'))
-                
-        return render_template('reset_password.html')
     except Exception as e:
         flash('An error occurred. Please try again.', 'error')
         print(f"Password reset error: {str(e)}")  # For debugging
@@ -657,7 +669,53 @@ def home():
 def protected():
     return render_template('protected.html')
 
+def generate_otp():
+    # Generate a 6-digit OTP
+    return ''.join(random.choices(string.digits, k=6))
+
+# Store OTPs with expiry (in memory for now - you might want to use Redis in production)
+otp_store = {}
+
+def store_otp(email, otp):
+    from datetime import datetime, timedelta
+    otp_store[email] = {
+        'otp': otp,
+        'expiry': datetime.now() + timedelta(minutes=10)  # OTP valid for 10 minutes
+    }
+
+def verify_otp_code(email, otp):
+    from datetime import datetime
+    if email not in otp_store:
+        return False
+    stored_data = otp_store[email]
+    if stored_data['expiry'] < datetime.now():
+        del otp_store[email]  # Clear expired OTP
+        return False
+    if stored_data['otp'] == otp:
+        del otp_store[email]  # Clear used OTP
+        return True
+    return False
+
+#route to verify OTP
+@app.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    if 'reset_email' not in session:
+        flash('Please start the password reset process again.', 'error')
+        return redirect(url_for('forgot_password'))
+        
+    if request.method == 'POST':
+        email = session['reset_email']
+        otp = request.form['otp']
+        
+        if verify_otp_code(email, otp):
+            session['otp_verified'] = True
+            return redirect(url_for('reset_password'))
+        else:
+            flash('Invalid or expired OTP. Please try again.', 'error')
+            
+    return render_template('verify_otp.html')
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Create database tables
-    app.run(debug=False,host='0.0.0.0') 
+    app.run(debug=False,host='0.0.0.0')
